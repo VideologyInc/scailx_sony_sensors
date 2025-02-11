@@ -1,0 +1,66 @@
+{
+    "search.exclude": {
+        "**/.repo": true,
+        "**/build/**": true,
+        "**/downloads": true,
+        "**/sstate-cache": true
+    },
+    "files.exclude": {
+        "build/cache/**": true,
+        "build/tmp/**": false,
+        "build/sstate-cache/**": true,
+        "downloads/**": true,
+        "*ctags*":  true,
+        "sstate-cache*/**": true,
+    },
+    "C_Cpp.files.exclude": {
+        "build/**": true,
+    },
+    "python.analysis.exclude": [
+        "**/build/**"
+    ],
+    "search.followSymlinks": false,
+    "git-blame.gitWebUrl": "",
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        ".repo/**": true,
+        "build/**": true,
+        "**/build_wsl/**": true,
+        "**/downloads/**": true,
+        "**/target": true,
+        "**/sstate-cache/**": true
+    },
+
+    "bitbake.parseOnSave": false,
+    "bitbake.pathToBuildFolder": "${workspaceFolder}/build",
+    "bitbake.pathToEnvScript": "${workspaceFolder}/poky/oe-init-build-env",
+    "bitbake.sdkImage": "scailx-ml",
+    "task.saveBeforeRun": "always",
+    "bitbake.sshTarget": "root@scailx-ai.local",
+    "search.useIgnoreFiles": false,
+    "files.associations": {
+        ".config": "makefile",
+        "*defconfig": "Makefile",
+        "sw-description": "libconfig",
+        "defconfig": "makefile",
+        "*.conf": "bitbake",
+        "*.inc": "bitbake"
+    },
+    "python.languageServer": "None",
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "mesonbuild.selectRootDir": false,
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/poky/bitbake/lib",
+        "${workspaceFolder}/poky/meta/lib",
+        "${workspaceFolder}/sources/poky/bitbake/lib",
+        "${workspaceFolder}/sources/poky/meta/lib"
+    ],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/poky/bitbake/lib",
+        "${workspaceFolder}/poky/meta/lib",
+        "${workspaceFolder}/sources/poky/bitbake/lib",
+        "${workspaceFolder}/sources/poky/meta/lib"
+    ],
+    "bitbake.pathToBitbakeFolder": "${workspaceFolder}/poky/bitbake"
+}

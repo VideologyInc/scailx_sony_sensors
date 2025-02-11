@@ -1,0 +1,25 @@
+##############################################################################
+# This is a template for a simple build configuration file.
+# this config only adds a few yocto packages to the main scailx-ml image.
+##############################################################################
+
+header:
+  version: 16
+  includes:
+    - repo: scailx
+      file: scailx_scarthgap.yaml
+
+repos:
+  scailx:
+    url: https://github.com/VideologyInc/scailx_yocto.git
+    branch: scarthgap
+    # use commit to pin the layer to a specific commit for repeatable builds, otherwise leave it to always use the latest from Scarthgap branch.
+    # commit: 2f34f0238057d3f3094c0bcf5cbb726dc9e90577
+
+target:
+  - scailx-ml
+
+local_conf_header:
+  # add packages to my image.
+  my-layer: |
+    CORE_IMAGE_EXTRA_INSTALL += "packagegroup-fsl-tools-gpu-external packagegroup-fsl-tools-gpu packagegroup-fsl-tools-testapps"

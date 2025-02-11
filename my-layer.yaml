@@ -1,0 +1,31 @@
+##############################################################################
+# This is a template for a Yocto BSP or Custom-override layer.
+# The layer in the "my-layer" folder is included, and creates a new image based
+# on the default scailx-ml image with a few extra packages.
+# the layer could also be used to build special packages, or override distro settings.
+##############################################################################
+
+header:
+  version: 14
+  includes:
+    - repo: scailx
+      file: scailx_scarthgap.yaml
+
+repos:
+  scailx:
+    url: https://github.com/VideologyInc/scailx_yocto.git
+    branch: scarthgap
+    # use commit to pin the layer to a specific commit for repeatable builds, otherwise leave it to always use the latest from Scarthgap branch.
+    # commit: 2f34f0238057d3f3094c0bcf5cbb726dc9e90577
+
+  my-layer:
+    layers:
+      my-layer:
+
+target:
+  - scailx-ml
+
+# add packages to my image by adding to the Yocto local.conf file.
+local_conf_header:
+  my-layer: |
+    CORE_IMAGE_EXTRA_INSTALL += "packagegroup-fsl-tools-gpu-external packagegroup-fsl-tools-gpu packagegroup-fsl-tools-testapps"
