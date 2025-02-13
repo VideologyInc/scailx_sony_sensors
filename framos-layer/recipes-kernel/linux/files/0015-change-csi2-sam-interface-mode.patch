@@ -1,0 +1,35 @@
+From 2b6442f60fbabc5174712d3c36d1b609f47a8363 Mon Sep 17 00:00:00 2001
+From: Kobus Goosen <kgoosen@videologyinc.com>
+Date: Tue, 11 Feb 2025 15:58:31 +0100
+Subject: [PATCH 5/5] changecsi2-sam interface-mode
+
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index c6af060c4497..0645884ce9c5 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -76,7 +76,7 @@
+ #define MIPI_CSIS_CMN_CTRL			0x04
+ #define MIPI_CSIS_CMN_CTRL_UPDATE_SHADOW	(1 << 16)
+ #define MIPI_CSIS_CMN_CTRL_HDR_MODE		(1 << 11)
+-#define MIPI_CSIS_CMN_CTRL_INTER_MODE		(1 << 10)
++#define MIPI_CSIS_CMN_CTRL_INTER_MODE		(3 << 10)
+ #define MIPI_CSIS_CMN_CTRL_LANE_NR_OFFSET	8
+ #define MIPI_CSIS_CMN_CTRL_LANE_NR_MASK		(3 << 8)
+ #define MIPI_CSIS_CMN_CTRL_UPDATE_SHADOW_CTRL	(1 << 2)
+@@ -778,6 +778,9 @@ static void mipi_csis_set_params(struct csi_state *state)
+ 	val &= ~MIPI_CSIS_CMN_CTRL_LANE_NR_MASK;
+ 	val |= (state->num_lanes - 1) << MIPI_CSIS_CMN_CTRL_LANE_NR_OFFSET;
+ 	val |= MIPI_CSIS_CMN_CTRL_HDR_MODE;
++	// set interlace mode
++	val &= ~(0x3 << 10);
++	val |= MIPI_CSIS_CMN_CTRL_INTER_MODE;
+ 	mipi_csis_write(state, MIPI_CSIS_CMN_CTRL, val);
+ 
+ 	__mipi_csis_set_format(state);
+-- 
+2.34.1
+

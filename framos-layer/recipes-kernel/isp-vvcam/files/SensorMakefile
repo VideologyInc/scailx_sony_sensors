@@ -1,0 +1,33 @@
+all:
+	@cd ov2775;  make || exit $$?;
+	@cd os08a20; make || exit $$?;
+	@cd ar1335;  make || exit $$?;
+	@cd camera-proxy-driver;  make || exit $$?;
+	@cd max9679x; make || exit $$?;
+	@cd imx662;  make || exit $$?;
+	@cd imx676;  make || exit $$?;
+	@cd imx678;  make || exit $$?;
+	@cd imx900;  make || exit $$?;
+
+clean:
+	@cd ov2775;   make clean;
+	@cd os08a20;  make clean;
+	@cd ar1335;   make clean;
+	@cd camera-proxy-driver;   make clean;
+	@cd max9679x; make clean;
+	@cd imx662;   make clean;
+	@cd imx676;   make clean;
+	@cd imx678;   make clean;
+	@cd imx900;   make clean;
+
+modules_install:
+	@cd ov2775;   make modules_install;
+	@cd os08a20;  make modules_install;
+	@cd ar1335;   make modules_install;
+	@cd camera-proxy-driver;   make modules_install;
+	@cd max9679x; make modules_install;
+	@cd imx662;   make modules_install;
+	@cd imx676;   make modules_install;
+	@cd imx678;   make modules_install;
+	@cd imx900;   make modules_install;
+
