@@ -83,6 +83,7 @@ IMAGE_INSTALL += " \
     hailortcli \
     libgsthailo \
     libhailort \
+    packagegroup-hailo-tappas-dev-pkg \
     serial-xfer \
     amazon-kvs-producer-sdk-cpp \
     imx-g2d-samples \
