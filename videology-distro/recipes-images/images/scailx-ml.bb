@@ -67,6 +67,8 @@ IMAGE_INSTALL += " \
     nodejs \
     nodejs-npm \
     git \
+    wget \
+    xvinfo \
     go2rtc \
     libwebsink \
     gputop \

@@ -72,9 +72,10 @@ IMAGE_INSTALL += " \
     ninja \
     nodejs \
     nodejs-npm \
-    go \
+    go go-runtime\
     nginx \
     fluentbit \
+    zabbix \
     htop \
     clang \
     i2c-tools \
@@ -93,17 +94,21 @@ IMAGE_INSTALL += " \
     python3-pyserial \
     gst-plugin-webrtc \
     libsoup-2.4 \
+    libusbgx \
+    libuvc \
     json-glib \
     tvm \
     openssl \
     paho-mqtt-c \
     flatbuffers \
+    fluentbit \
     protobuf \
     gst-variable-rtsp-server \
     python3-ar0234 \
     curl \
     git \
     nano \
+    micro \
     ca-certificates \
     ser2net \
     iwd \
