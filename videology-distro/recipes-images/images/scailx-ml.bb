@@ -69,9 +69,12 @@ IMAGE_INSTALL += " \
     ffmpeg \
     python3-pycairo \
     python3-pip \
+    python3-virtualenv \
     python3-periphery \
     ${DOCKER} \
 "
+
+IMAGE_INSTALL += " scailx-notebooks "
 
 IMAGE_INSTALL += " ${@bb.utils.contains('SCAILX_SOURCES', 'yes', 'scailx-gst-plugins scailx-ai-portal', '', d)} "
 
@@ -99,3 +102,7 @@ cleanup_dirs () {
     rm -rf ${IMAGE_ROOTFS}/usr/lib/python3.10/site-packages/torch/test/
 }
 
+ROOTFS_POSTPROCESS_COMMAND:append = " ;pip_is_pip3; "
+pip_is_pip3 () {
+    ln -s -T ${bindir}/pip3 ${IMAGE_ROOTFS}${bindir}/pip
+}
