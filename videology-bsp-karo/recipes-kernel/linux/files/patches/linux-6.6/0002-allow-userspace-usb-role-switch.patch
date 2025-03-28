@@ -1,0 +1,45 @@
+From 81a89bc2fb3b3707204eecd97b47cf23ce6a9c74 Mon Sep 17 00:00:00 2001
+From: Kobus Goosen <kgoosen@videologyinc.com>
+Date: Wed, 26 Mar 2025 14:44:09 +0100
+Subject: [PATCH] allow userspace usb-role switch
+
+---
+ drivers/usb/dwc3/drd.c      | 1 +
+ drivers/usb/dwc3/dwc3-pci.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/usb/dwc3/drd.c b/drivers/usb/dwc3/drd.c
+index 57ddd2e43022..664fc016dca5 100644
+--- a/drivers/usb/dwc3/drd.c
++++ b/drivers/usb/dwc3/drd.c
+@@ -505,10 +505,11 @@ static int dwc3_setup_role_switch(struct dwc3 *dwc)
+ 		dwc->role_switch_default_mode = USB_DR_MODE_PERIPHERAL;
+ 		mode = DWC3_GCTL_PRTCAP_DEVICE;
+ 	}
+ 	dwc3_set_mode(dwc, mode);
+ 
++	dwc3_role_switch.allow_userspace_control = true;
+ 	dwc3_role_switch.fwnode = dev_fwnode(dwc->dev);
+ 	dwc3_role_switch.set = dwc3_usb_role_switch_set;
+ 	dwc3_role_switch.get = dwc3_usb_role_switch_get;
+ 	dwc3_role_switch.driver_data = dwc;
+ 	dwc->role_sw = usb_role_switch_register(dwc->dev, &dwc3_role_switch);
+diff --git a/drivers/usb/dwc3/dwc3-pci.c b/drivers/usb/dwc3/dwc3-pci.c
+index 052852f80146..b061a38bc963 100644
+--- a/drivers/usb/dwc3/dwc3-pci.c
++++ b/drivers/usb/dwc3/dwc3-pci.c
+@@ -180,10 +180,11 @@ static const struct property_entry dwc3_pci_amd_properties[] = {
+ 
+ static const struct property_entry dwc3_pci_mr_properties[] = {
+ 	PROPERTY_ENTRY_STRING("dr_mode", "otg"),
+ 	PROPERTY_ENTRY_BOOL("usb-role-switch"),
+ 	PROPERTY_ENTRY_STRING("role-switch-default-mode", "host"),
++	PROPERTY_ENTRY_BOOL("allow-userspace-role-switch"),
+ 	PROPERTY_ENTRY_BOOL("linux,sysdev_is_parent"),
+ 	{}
+ };
+ 
+ static const struct software_node dwc3_pci_intel_swnode = {
+-- 
+2.34.1
+
