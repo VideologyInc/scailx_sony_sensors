@@ -49,6 +49,7 @@ IMAGE_INSTALL += " \
     hailo-firmware \
     v4l-utils \
     media-ctl \
+    ca-certificates \
     v4l2loopback \
     v4l2loopback-utils \
     python3-pyserial \
@@ -77,6 +78,8 @@ IMAGE_INSTALL += " \
 IMAGE_INSTALL += " scailx-notebooks "
 
 IMAGE_INSTALL += " ${@bb.utils.contains('SCAILX_SOURCES', 'yes', 'scailx-gst-plugins scailx-ai-portal', '', d)} "
+
+IMAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'impala', '', d)} "
 
 CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-core-full-cmdline \

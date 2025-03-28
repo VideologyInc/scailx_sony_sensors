@@ -103,6 +103,8 @@ IMAGE_INSTALL += " \
     nano \
     ca-certificates \
     ser2net \
+    iwd \
+    impala \
     ffmpeg \
     python3-pycairo \
     python3-pip \
