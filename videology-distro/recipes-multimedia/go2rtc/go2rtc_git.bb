@@ -5,12 +5,12 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRCNAME = "go2rtc"
 
-SRCREV = "a4885c2c3abce58074d04878bba0d72105642a9b"
+SRCREV = "fa580c516efa95770be2137855c3c3cf19b8092b"
 GO_IMPORT = "github.com/AlexxIT/go2rtc"
 SRC_URI = "git://${GO_IMPORT};branch=master;protocol=https"
 SRC_URI += "file://0001-remove-non-scailx-inputs.patch;patchdir=src/${GO_IMPORT}"
 
-PV = "1.9.4"
+PV = "1.9.9"
 GO_EXTRA_LDFLAGS = "-s -w"
 export CGO_ENABLED = "0"
 GO_INSTALL = "${GO_IMPORT}"
