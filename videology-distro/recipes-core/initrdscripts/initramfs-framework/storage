@@ -85,8 +85,10 @@ storage_run() {
     # mount boot partition
     get_slot
     mkdir -p /boot
+    fsck.ext4 -p /dev/disk/by-label/boot
     mount /dev/disk/by-label/boot    /boot    || mount /dev/disk/by-partlabel/boot    /boot
 
     mkdir -p /storage
+    fsck.ext4 -p /dev/disk/by-label/storage
     mount /dev/disk/by-label/storage /storage || mount /dev/disk/by-partlabel/storage /storage
 }
