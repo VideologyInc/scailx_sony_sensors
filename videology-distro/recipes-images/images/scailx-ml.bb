@@ -42,6 +42,7 @@ IMAGE_INSTALL += " \
     dtc \
     lsof \
     i2c-tools \
+    serial-xfer \
     pyhailort \
     hailo-pci \
     hailortcli \
@@ -57,6 +58,7 @@ IMAGE_INSTALL += " \
     gst-variable-rtsp-server \
     lvds2mipi-module \
     python3-lvds2mipi \
+    dummy-csi-sensor \
     kernel-module-gs-ar0234 \
     python3-ar0234 \
     packagegroup-imx-core-tools \

@@ -83,6 +83,7 @@ IMAGE_INSTALL += " \
     hailortcli \
     libgsthailo \
     libhailort \
+    serial-xfer \
     amazon-kvs-producer-sdk-cpp \
     imx-g2d-samples \
     imx-m7-demos \
