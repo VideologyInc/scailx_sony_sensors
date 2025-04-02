@@ -66,6 +66,7 @@ IMAGE_INSTALL += " \
     nodejs-npm \
     git \
     go2rtc \
+    libwebsink \
     gputop \
     ser2net \
     ffmpeg \
