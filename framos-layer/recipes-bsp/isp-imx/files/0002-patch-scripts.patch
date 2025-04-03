@@ -1,63 +1,18 @@
-From bd24432ceca1e2d0cc7c7bf3732947a5adc72cae Mon Sep 17 00:00:00 2001
+From 3179e1078fcf70db76526c2eb4284a13527c7137 Mon Sep 17 00:00:00 2001
 From: Kobus Goosen <kgoosen@videologyinc.com>
-Date: Tue, 11 Feb 2025 15:35:56 +0100
-Subject: [PATCH 2/4] patch scripts
+Date: Thu, 3 Apr 2025 15:48:05 +0200
+Subject: [PATCH 1/3] patch scripts
 
 ---
- imx/run.sh       | 159 +++++++++++++++++++++++++++++++++++++++++------
- imx/start_isp.sh |  74 ++++++++++++++++++++++
- 2 files changed, 215 insertions(+), 18 deletions(-)
+ imx/run.sh       | 139 +++++++++++++++++++++++++++++++++++++++++++++++
+ imx/start_isp.sh |  74 +++++++++++++++++++++++++
+ 2 files changed, 213 insertions(+)
 
 diff --git a/imx/run.sh b/imx/run.sh
-index 29f1957..7de5ed1 100755
+index 29f1957..ffea841 100755
 --- a/imx/run.sh
 +++ b/imx/run.sh
-@@ -2,7 +2,7 @@
- #
- # Start the isp_media_server in the configuration from user
- # (c) NXP 2020-2022
--# (c) Basler 2020
-+# (c) Framos 2024
- #
- 
- RUN_SCRIPT=`realpath -s $0`
-@@ -15,24 +15,11 @@ LOCAL_RUN="0" # search modules in /lib/modules and libraries in /usr/lib
- RUN_OPTION=""
- LOCAL_RUN="0"
- # an array with the modules to load, insertion order
--declare -a MODULES=("vvcam-dwe" "vvcam-isp" "vvcam-video")
-+declare -a MODULES=("imx8-media-dev" "vvcam-dwe" "vvcam-isp" "vvcam-video")
- 
- USAGE="Usage:\n"
- USAGE+="run.sh -c <isp_config> &\n"
- USAGE+="Supported configurations:\n"
--USAGE+="\tbasler_1080p60         - single basler camera on MIPI-CSI1, 1920x1080, 60 fps\n"
--USAGE+="\tdual_basler_1080p60    - dual basler cameras on MIPI-CSI1/2, 1920x1080, 60 fps\n"
--USAGE+="\tbasler_4k              - single basler camera on MIPI-CSI1, 3840x2160, 30 fps\n"
--USAGE+="\tbasler_1080p60hdr      - single basler camera on MIPI-CSI1, 1920x1080, 60 fps, HDR configuration\n"
--USAGE+="\tdual_basler_1080p60hdr - dual basler cameras on MIPI-CSI1/2, 1920x1080, 60 fps, HDR configuration\n"
--USAGE+="\tbasler_4khdr           - single basler camera on MIPI-CSI1, 3840x2160, 30 fps, HDR configuration\n"
--
--USAGE+="\tos08a20_1080p60         - single os08a20 camera on MIPI-CSI1, 1920x1080, 60 fps\n"
--USAGE+="\tdual_os08a20_1080p60    - dual os08a20 cameras on MIPI-CSI1/2, 1920x1080, 60 fps\n"
--USAGE+="\tos08a20_4k              - single os08a20 camera on MIPI-CSI1, 3840x2160, 30 fps\n"
--USAGE+="\tos08a20_1080p30hdr      - single os08a20 camera on MIPI-CSI1, 1920x1080, 30 fps, HDR configuration\n"
--USAGE+="\tdual_os08a20_1080p30hdr - dual os08a20 cameras on MIPI-CSI1/2, 1920x1080, 30 fps, HDR configuration\n"
--USAGE+="\tos08a20_4khdr           - single os08a20 camera on MIPI-CSI1, 3840x2160, 15 fps, HDR configuration\n"
- 
- # parse command line arguments
- while [ "$1" != "" ]; do
-@@ -43,9 +30,6 @@ while [ "$1" != "" ]; do
- 			;;
- 		-l | --local )
- 			LOCAL_RUN="1"
--			# search modules and libraries near this script
--			# this should work with the flat structure from VSI/Basler
--			# but also with the output from make_isp_build_*.sh
- 			;;
- 		-lm | --load-modules )
- 			LOAD_MODULES="1"
-@@ -87,6 +71,60 @@ write_default_mode_files () {
+@@ -87,6 +87,60 @@ write_default_mode_files () {
  	echo "[mode.3]" >> DAA3840_MODES.txt
  	echo "xml = \"DAA3840_30MC_1080P-hdr.xml\"" >> DAA3840_MODES.txt
  	echo "dwe = \"dewarp_config/daA3840_30mc_1080P.json\"" >> DAA3840_MODES.txt
@@ -116,12 +71,12 @@ index 29f1957..7de5ed1 100755
 +	echo "xml = \"IMX900_Basic_1008x704.xml\"" >> IMX900_MODES.txt
 +	echo "dwe = \"dewarp_config/sensor_dwe_IMX900_Basic_1008x704.json\"" >> IMX900_MODES.txt
  }
- 
+
  # write the sensonr config file
-@@ -308,6 +346,91 @@ case "$ISP_CONFIG" in
-                          write_sensor_cfg_file "Sensor0_Entry.cfg" $CAM_NAME $DRV_FILE $MODE_FILE $MODE
-                          write_sensor_cfg_file "Sensor1_Entry.cfg" $CAM_NAME $DRV_FILE $MODE_FILE $MODE
-                          ;;
+@@ -196,6 +250,91 @@ write_default_mode_files
+ echo "Trying configuration \"$ISP_CONFIG\"..."
+ MODULES_TO_REMOVE=("basler-camera-driver-vvcam" "os08a20" "ov2775" "imx8-media-dev" "${MODULES[@]}")
+ case "$ISP_CONFIG" in
 +		imx662 )
 +			MODULES_TO_REMOVE=("max96792" "max96793" "imx662" "${MODULES[@]}")
 +			MODULES=("max96792" "max96793" "imx662" "${MODULES[@]}")
@@ -207,9 +162,9 @@ index 29f1957..7de5ed1 100755
 +			write_sensor_cfg_file "Sensor0_Entry.cfg" $CAM_NAME $DRV_FILE $MODE_FILE $MODE
 +			write_sensor_cfg_file "Sensor1_Entry.cfg" $CAM_NAME $DRV_FILE $MODE_FILE $MODE
 +			;;
- 		 *)
- 			echo "ISP configuration \"$ISP_CONFIG\" unsupported."
- 			echo -e "$USAGE" >&2
+ 		basler_4k )
+ 			MODULES=("basler-camera-driver-vvcam" "${MODULES[@]}")
+ 			RUN_OPTION="CAMERA0"
 diff --git a/imx/start_isp.sh b/imx/start_isp.sh
 index bfc7cc1..da48bca 100755
 --- a/imx/start_isp.sh
@@ -217,7 +172,7 @@ index bfc7cc1..da48bca 100755
 @@ -12,6 +12,12 @@ NR_DEVICE_TREE_OV5640=$(grep ov5640 `find /sys/firmware/devicetree/base/soc@0/ -
  NR_DEVICE_TREE_OS08A20=$(grep os08a20 `find /sys/firmware/devicetree/base/soc@0/ -name compatible | grep i2c` -l | wc -l 2> /dev/null)
  NR_SCAILX_CAMS=$(find /proc/device-tree/chosen/overlays/cam* | wc -l 2> /dev/null)
- 
+
 +NR_DEVICE_TREE_IMX662=$(grep imx662 /sys/firmware/devicetree/base/soc@0/*/i2c@*/*/*/*/compatible -l | wc -l 2> /dev/null)
 +NR_DEVICE_TREE_IMX676=$(grep imx676 /sys/firmware/devicetree/base/soc@0/*/i2c@*/*/*/*/compatible -l | wc -l 2> /dev/null)
 +NR_DEVICE_TREE_IMX678=$(grep imx678 /sys/firmware/devicetree/base/soc@0/*/i2c@*/*/*/*/compatible -l | wc -l 2> /dev/null)
@@ -226,11 +181,11 @@ index bfc7cc1..da48bca 100755
 +
  # check if the basler device has been enabled in the device tree
  if [ $NR_DEVICE_TREE_BASLER -eq 1 ]; then
- 
+
 @@ -60,6 +66,74 @@ elif [ $NR_DEVICE_TREE_OS08A20 -eq 1 ]; then
  		exec ./run.sh -c os08a20_1080p60 -lm
  	fi
- 
+
 +# check for imx662 devices
 +elif [ $NR_DEVICE_TREE_IMX662 -eq 2 ]; then
 +
@@ -300,8 +255,8 @@ index bfc7cc1..da48bca 100755
 +	exec ./run.sh -c imx900_2k -lm
 +
  elif [ $NR_DEVICE_TREE_OS08A20 -eq 2 ]; then
- 
+
  	echo "Starting isp_media_server for Dual os08a20"
--- 
+--
 2.34.1
 

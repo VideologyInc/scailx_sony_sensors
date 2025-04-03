@@ -1,17 +1,17 @@
-From fd32f778272e1b1ec20bd9e7ec444ebbf6887350 Mon Sep 17 00:00:00 2001
+From 256b2b4768d56bb11f04d16a0587a5a58d280551 Mon Sep 17 00:00:00 2001
 From: Kobus Goosen <kgoosen@videologyinc.com>
-Date: Tue, 11 Feb 2025 15:37:18 +0100
-Subject: [PATCH 3/4] isi cmake
+Date: Thu, 3 Apr 2025 16:43:19 +0200
+Subject: [PATCH] isi-cmake
 
 ---
- units/isi/CMakeLists.txt | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ units/isi/CMakeLists.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/units/isi/CMakeLists.txt b/units/isi/CMakeLists.txt
-index a91699b..db555c9 100755
+index a91699b..36d6904 100755
 --- a/units/isi/CMakeLists.txt
 +++ b/units/isi/CMakeLists.txt
-@@ -73,6 +73,11 @@ add_subdirectory( drv/AR1335 )
+@@ -73,6 +73,10 @@ add_subdirectory( drv/AR1335 )
  ###add_subdirectory( drv/OV8810 )
  #add_subdirectory( drv/OV14825 )
  #add_subdirectory( drv/OV5640 )
@@ -19,21 +19,20 @@ index a91699b..db555c9 100755
 +add_subdirectory( drv/imx676 )
 +add_subdirectory( drv/imx678 )
 +add_subdirectory( drv/imx900 )
-+
- 
+
  else (GENERATE_PARTITION_BUILD)
  # partition build
-@@ -87,6 +92,10 @@ include_directories(
+@@ -87,6 +91,10 @@ include_directories(
      )
- 
+
  add_subdirectory( drv/OS08a20 )
 +add_subdirectory( drv/imx662 )
 +add_subdirectory( drv/imx676 )
 +add_subdirectory( drv/imx678 )
 +add_subdirectory( drv/imx900 )
- 
+
  add_custom_target(copy_shell_libs_${module} ALL
         COMMENT "##Copy isi drv cfg to shell libs"
--- 
+--
 2.34.1
 
