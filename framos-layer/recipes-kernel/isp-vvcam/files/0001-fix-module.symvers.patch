@@ -1,0 +1,67 @@
+From 3a501a04a36578e0e114a23c32ff3262c6563814 Mon Sep 17 00:00:00 2001
+From: Kobus Goosen <kgoosen@videologyinc.com>
+Date: Thu, 3 Apr 2025 14:18:25 +0200
+Subject: [PATCH] fix nodule.symvers
+
+---
+ isp-vvcam/vvcam/v4l2/sensor/imx662/Makefile | 2 +-
+ isp-vvcam/vvcam/v4l2/sensor/imx676/Makefile | 2 +-
+ isp-vvcam/vvcam/v4l2/sensor/imx678/Makefile | 2 +-
+ isp-vvcam/vvcam/v4l2/sensor/imx900/Makefile | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx662/Makefile b/isp-vvcam/vvcam/v4l2/sensor/imx662/Makefile
+index a989a3a..98b8bfe 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx662/Makefile
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx662/Makefile
+@@ -29,7 +29,7 @@ clean:
+ else
+ 
+ all:
+-	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules
++	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules KBUILD_EXTRA_SYMBOLS=$(PWD)/../max9679x/Module.symvers
+ modules_install:
+ 	make -C $(KERNEL_SRC) M=$(PWD) modules_install
+ clean:
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx676/Makefile b/isp-vvcam/vvcam/v4l2/sensor/imx676/Makefile
+index 04bc9c2..6fd3a47 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx676/Makefile
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx676/Makefile
+@@ -29,7 +29,7 @@ clean:
+ else
+ 
+ all:
+-	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules
++	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules KBUILD_EXTRA_SYMBOLS=$(PWD)/../max9679x/Module.symvers
+ modules_install:
+ 	make -C $(KERNEL_SRC) M=$(PWD) modules_install
+ clean:
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx678/Makefile b/isp-vvcam/vvcam/v4l2/sensor/imx678/Makefile
+index 3fa4f70..95b7b1c 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx678/Makefile
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx678/Makefile
+@@ -29,7 +29,7 @@ clean:
+ else
+ 
+ all:
+-	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules
++	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules KBUILD_EXTRA_SYMBOLS=$(PWD)/../max9679x/Module.symvers
+ modules_install:
+ 	make -C $(KERNEL_SRC) M=$(PWD) modules_install
+ clean:
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx900/Makefile b/isp-vvcam/vvcam/v4l2/sensor/imx900/Makefile
+index 80340fd..fbc10ac 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx900/Makefile
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx900/Makefile
+@@ -29,7 +29,7 @@ clean:
+ else
+ 
+ all:
+-	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules
++	make -C $(KERNEL_SRC) ARCH=$(ARCH_TYPE) M=$(PWD) modules KBUILD_EXTRA_SYMBOLS=$(PWD)/../max9679x/Module.symvers
+ modules_install:
+ 	make -C $(KERNEL_SRC) M=$(PWD) modules_install
+ clean:
+-- 
+2.34.1
+
