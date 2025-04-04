@@ -13,3 +13,4 @@ MODULES_MODULE_SYMVERS_LOCATION = "max9679x"
 
 S = "${WORKDIR}/git/isp-vvcam/vvcam/v4l2/sensor"
 
+COMPATIBLE_MACHINE = "(mx8mp-nxp-bsp)"
