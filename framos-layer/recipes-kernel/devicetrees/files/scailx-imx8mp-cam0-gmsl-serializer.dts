@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+/*
+ * Copyright (C) 2023 VideologyInc
+ *
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+&{/chosen} {
+	overlays {
+		cam0-gmsl-serializer = __TIMESTAMP__;
+	};
+};
+
+&csi0_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	framos_dser_a: max96792_a@6a {
+		compatible = "framos,max96792";
+		reg = <0x6a>;
+		csi-mode = "2x4";
+		max-src = <1>;
+		reset-gpios = <&gpio_expander 9 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
+	framos_ser_prim_a: max96793_prim_a@42 {
+		compatible = "framos,max96793";
+		reg = <0x42>;
+		gmsl-dser-device = <&framos_dser_a>;
+		is-prim-ser;
+		status = "okay";
+	};
+};
+
+&sensor_csi0 {
+	gmsl = "gmsl";
+	gmsl-ser-device = <&framos_ser_prim_a>;
+	gmsl-dser-device = <&framos_dser_a>;
+    /delete-property/ rst-gpios;
+
+	gmsl-link {
+		src-csi-port = "b";
+		dst-csi-port = "a";
+		serdes-csi-link = "a";
+		csi-mode = "1x4";
+		st-vc = <0>;
+		vc-id = <0>;
+		num-lanes = <4>;
+		streams = "raw12";
+	};
+};
