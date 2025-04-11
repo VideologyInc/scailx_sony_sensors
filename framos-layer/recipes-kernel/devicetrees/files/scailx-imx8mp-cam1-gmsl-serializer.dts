@@ -11,7 +11,7 @@
 
 &{/chosen} {
 	overlays {
-		cam1-gmsl-serializer = __TIMESTAMP__;
+		cam1-gmsl-imx662 = __TIMESTAMP__;
 	};
 };
 
@@ -35,22 +35,74 @@
 		is-prim-ser;
 		status = "okay";
 	};
+
+	sensor_csi1: imx662_mipi@1a {
+		compatible = "framos,imx662";
+		reg = <0x1a>;
+		def-addr = <0x1a>;
+		clocks = <&clk_dummy>;
+		clock-names = "csi_mclk";
+		csi_id = <1>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		status = "okay";
+		// rst-gpios = <&gpio_expander 10 GPIO_ACTIVE_LOW>;
+
+		gmsl = "gmsl";
+		gmsl-ser-device = <&framos_ser_prim_b>;
+		gmsl-dser-device = <&framos_dser_b>;
+
+		gmsl-link {
+			src-csi-port = "b";
+			dst-csi-port = "a";
+			serdes-csi-link = "a";
+			csi-mode = "1x4";
+			st-vc = <0>;
+			vc-id = <0>;
+			num-lanes = <4>;
+			streams = "raw12";
+		};
+
+		port {
+			mipi_1_ep: endpoint {
+				remote-endpoint = <&mipi_csi1_ep>;
+				data-lanes = <1 2 3 4>;
+				clock-lanes = <0>;
+				max-pixel-frequency = /bits/ 64 <500000000>;
+			};
+		};
+	};
 };
 
-&sensor_csi1 {
-	gmsl = "gmsl";
-	gmsl-ser-device = <&framos_ser_prim_b>;
-	gmsl-dser-device = <&framos_dser_b>;
-    /delete-property/ rst-gpios;
+&mipi_csi_1 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
 
-	gmsl-link {
-		src-csi-port = "b";
-		dst-csi-port = "a";
-		serdes-csi-link = "a";
-		csi-mode = "1x4";
-		st-vc = <0>;
-		vc-id = <0>;
-		num-lanes = <4>;
-		streams = "raw12";
+	port@0 {
+		reg = <0>;
+		mipi_csi1_ep: endpoint {
+			remote-endpoint = <&mipi_1_ep>;
+			data-lanes = <4>;
+			csis-hs-settle = <13>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+		};
 	};
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_1 {
+	status = "disabled";
+};
+
+&isp_1 {
+	status = "okay";
+};
+
+&dewarp {
+	status = "okay";
 };
