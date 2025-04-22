@@ -10,6 +10,8 @@ IMAGE_FSTYPES = "container docker-archive.xz"
 inherit core-image
 inherit image-oci
 
+OCI_IMAGE_TAG = "${SCAILX_VERSION}"
+
 # get rid of 'rootfs' tag
 IMAGE_NAME_SUFFIX ?= ""
 
@@ -39,7 +41,20 @@ IMAGE_INSTALL = " \
         openssh-sftp-server \
         bash \
         busybox \
+        wget curl \
+        coreutils \
+        cmake \
 "
+
+IMAGE_INSTALL += " \
+    ${IMAGE_INSTALL_PKCS11TOOL} \
+"
+
+IMAGE_INSTALL_PKCS11TOOL = " \
+    opensc pkcs11-provider pkcs11-helper se05x-pkcs11 \
+    packagegroup-security-tpm2 \
+    swtpm softhsm \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'optee-client optee-os', '', d)}"
 
 IMAGE_INSTALL += " \
     scailx-ppa-key \
@@ -145,3 +160,4 @@ rootfs_fixup_var_volatile () {
     install -m 1777 -d ${IMAGE_ROOTFS}/${localstatedir}/volatile/tmp
     install -m 755 -d ${IMAGE_ROOTFS}/${localstatedir}/volatile/log
 }
+

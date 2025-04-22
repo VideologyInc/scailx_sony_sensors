@@ -45,6 +45,12 @@ repos:
   meta-virtualization:
     url: https://git.yoctoproject.org/meta-virtualization
 
+  meta-security:
+    layers:
+      ../meta-security:
+      meta-parsec:
+      meta-tpm:
+
   poky:
     layers:
       meta:
