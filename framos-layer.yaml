@@ -2,7 +2,6 @@
 # This is a template for a Yocto BSP or Custom-override layer.
 # The layer in the "framos-layer" folder is included, and creates a new image based
 # on the default scailx-ml image with a few extra packages.
-# the layer could also be used to build special packages, or override distro settings.
 ##############################################################################
 
 header:
@@ -16,7 +15,7 @@ repos:
     url: https://github.com/VideologyInc/scailx_yocto.git
     branch: v0.11_staging
     # use commit to pin the layer to a specific commit for repeatable builds, otherwise leave it to always use the latest from Scarthgap branch.
-    commit: d53fba6508a36f8693b4f3ac2aed1c7c985c597d
+    commit: 78176fa0ff13552ae8b7dae6e689c1f5f7f1082d
 
   framos-layer:
     layers:
