@@ -29,6 +29,7 @@ repos:
     commit: 3421a7063a58e4e027130326ab3acccbe3230b30
   meta-browser:
     commit: 40ef1d0799124a36b22df11a7562868c0edb23b1
+
   # meta-nxp-avb:
   #   branch: real-time-edge-scarthgap
   #   url: https://github.com/NXP/meta-nxp-avb.git
@@ -50,7 +51,7 @@ target:
 
 local_conf_header:
   distro: |
-    SCAILX_VERSION="0.11.5"
+    SCAILX_VERSION="0.11.6"
     PACKAGE_CLASSES = "package_ipk"
   folders: |
     BB_GENERATE_MIRROR_TARBALLS = "1"
