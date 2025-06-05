@@ -1,0 +1,39 @@
+From 550466dbd88575199e58ce885972e0c9737283b3 Mon Sep 17 00:00:00 2001
+From: Kobus Goosen <kgoosen@videologyinc.com>
+Date: Thu, 5 Jun 2025 19:12:25 +0200
+Subject: [PATCH 2/2] use system python-installation and pybind
+
+---
+ core/hailo/meson.build | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
+
+diff --git a/core/hailo/meson.build b/core/hailo/meson.build
+index 5502c84..740ff09 100644
+--- a/core/hailo/meson.build
++++ b/core/hailo/meson.build
+@@ -57,20 +57,10 @@ if get_option('include_python')
+     # Pybind Include Directories
+     pymod = import('python')
+     python_version = 'python' + get_option('python_version')
+-    python_installation = pymod.find_installation(python_version)
++    python_installation = pymod.find_installation()
+     python_dep = python_installation.dependency(embed : true)
+-    python_package_install_dir = run_command(python_version, '-m', 'pip', 'show', 'pip').stdout().split('Location:')[1].split()[0]
+-    pybind_inc = [include_directories(get_option('pybind11'), is_system: true)]
+     # Pybind Dependecy
+-    pybind_dep = declare_dependency(
+-        compile_args : [
+-            # see https://github.com/pybind/pybind11/issues/1604
+-            '-fsized-deallocation',
+-            '-fvisibility=hidden'
+-        ],
+-        include_directories : pybind_inc,
+-        dependencies : [python_dep],
+-    )
++    pybind_dep = dependency('pybind11')
+ endif
+
+ # Plugin Dependencies
+--
+2.34.1
+
