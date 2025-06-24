@@ -9,8 +9,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 IMAGE_FSTYPES = "container docker-archive.xz"
 inherit core-image
 inherit image-oci
+inherit extrausers
 
 OCI_IMAGE_TAG = "${SCAILX_VERSION}"
+OCI_IMAGE_ENTRYPOINT ?= "bash"
+OCI_IMAGE_RUNTIME_UID ?= "1000"
 
 # get rid of 'rootfs' tag
 IMAGE_NAME_SUFFIX ?= ""
@@ -161,3 +164,23 @@ rootfs_fixup_var_volatile () {
     install -m 755 -d ${IMAGE_ROOTFS}/${localstatedir}/volatile/log
 }
 
+SDK_TOOLCHAIN_LANGS += 'rust'
+TOOLCHAIN_TARGET_TASK:append = " libstd-rs "
+TOOLCHAIN_HOST_TASK:append =   " packagegroup-rust-cross-canadian-${MACHINE} "
+
+# EXTRA_USERS_PARAMS = "usermod -P '' root;"
+# EXTRA_USERS_PARAMS:append = " useradd dev;"
+# EXTRA_USERS_PARAMS:append = " groupadd wheel;"
+# EXTRA_USERS_PARAMS:append = " usermod -P '' dev;"
+# EXTRA_USERS_PARAMS:append = " usermod -aG wheel dev;"
+
+EXTRA_USERS_PARAMS += "useradd dev; "
+# Adds 'dev' to the 'adm' and 'sudo' groups, granting administrative privileges.
+EXTRA_USERS_PARAMS += "usermod -a -G adm,sudo dev; "
+
+# Configures 'dev' to use sudo without a password prompt for any command.
+ROOTFS_POSTPROCESS_COMMAND += "add_sodoers ; "
+add_sodoers () {
+    echo "dev ALL=(ALL) NOPASSWD: ALL" >> ${IMAGE_ROOTFS}${sysconfdir}/sudoers
+    chmod 4755 ${IMAGE_ROOTFS}${bindir}/sudo
+}

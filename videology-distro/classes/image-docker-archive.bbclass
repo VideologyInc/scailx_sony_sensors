@@ -1,5 +1,10 @@
+# easily loadable arfchive image type
+# load the image by running:
+#   docker load < *.docker-archive.xz
+
 do_image_docker_archive[depends] += "skopeo-native:do_populate_sysroot"
 IMAGE_TYPEDEP:docker-archive = "oci"
+
 
 IMAGE_CMD:docker-archive () {
     cd ${IMGDEPLOYDIR}
