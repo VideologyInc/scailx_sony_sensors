@@ -1,0 +1,21 @@
+From 74d3c8ed5f9b889ba7f95c48836fdeb29b4daf9d Mon Sep 17 00:00:00 2001
+From: kobus <kobus@git.com>
+Date: Mon, 14 Jul 2025 06:54:21 +0000
+Subject: [PATCH] ignore onnx eigen hash check
+
+---
+ cmake/external/eigen.cmake | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/cmake/external/eigen.cmake b/cmake/external/eigen.cmake
+index b123adb62..fe9016c85 100644
+--- a/cmake/external/eigen.cmake
++++ b/cmake/external/eigen.cmake
+@@ -6,7 +6,6 @@ else ()
+     FetchContent_Declare(
+         eigen
+         URL ${DEP_URL_eigen}
+-        URL_HASH SHA1=${DEP_SHA1_eigen}
+     )
+ 
+     FetchContent_Populate(eigen)
