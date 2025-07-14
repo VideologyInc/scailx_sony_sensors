@@ -6,6 +6,10 @@ ACTION=="add", SUBSYSTEM=="video4linux", ATTR{name}=="mxc_isi.1.capture", DRIVER
 ACTION=="add", SUBSYSTEM=="video4linux", ATTR{name}=="viv_v4l20",         DRIVERS=="vvcam-video", SYMLINK+="video-isp-csi0"
 ACTION=="add", SUBSYSTEM=="video4linux", ATTR{name}=="viv_v4l21",         DRIVERS=="vvcam-video", SYMLINK+="video-isp-csi1"
 
+# ISP Device
+ACTION=="add", SUBSYSTEM=="video4linux", ATTR{name}=="vvcam-isp.0", SYMLINK+="isp-csi0"
+ACTION=="add", SUBSYSTEM=="video4linux", ATTR{name}=="vvcam-isp.1", SYMLINK+="isp-csi1"
+
 # VPU ENC/DEC M2M Video Device
 # ACTION=="add", SUBSYSTEM=="video4linux", KERNEL=="video*",                DRIVERS=="vsiv4l2",     SYMLINK+="video-vpu-$number"
 ACTION=="add", SUBSYSTEM=="video4linux", KERNEL=="video*",                DRIVERS=="vsiv4l2", \
