@@ -1,0 +1,229 @@
+From 38d2b68879a30448da490491e835d66a12859fcc Mon Sep 17 00:00:00 2001
+From: kobus <kobus@git.com>
+Date: Mon, 14 Jul 2025 14:33:53 +0000
+Subject: [PATCH] remove warning prints
+
+---
+ .../vvcam/v4l2/sensor/imx662/imx662_mipi.c    | 24 +++++-------
+ .../vvcam/v4l2/sensor/imx900/imx900_mipi.c    | 37 +++++++++++--------
+ 2 files changed, 32 insertions(+), 29 deletions(-)
+
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+index 210be49..02f4d4d 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+@@ -994,7 +994,7 @@ static int imx662_change_data_rate(struct imx662 *sensor, u8 data_rate)
+ 	}
+ 
+ 	if (current_lane_mode == IMX662_TWO_LANE_MODE) {
+-		pr_warn("%s: 2 lane mode is not supported, switching to 4 lane mode\n", __func__);
++		pr_info("%s: 2 lane mode is not supported, switching to 4 lane mode\n", __func__);
+ 		ret = imx662_write_reg(sensor, LANEMODE, IMX662_FOUR_LANE_MODE);
+ 		if (ret < 0) {
+ 			pr_err("%s: Could not set to 4 lane mode\n", __func__);
+@@ -1010,13 +1010,13 @@ static int imx662_change_data_rate(struct imx662 *sensor, u8 data_rate)
+ 
+ 	if (current_binning_mode == IMX662_BINNING_MODE) {
+ 		if (data_rate != IMX662_594_MBPS) {
+-			pr_warn("%s: Selected data rate is not supported in 4 lane binning mode, switching to 594 data rate!\n", __func__);
++			pr_info("%s: Selected data rate is not supported in 4 lane binning mode, switching to 594 data rate!\n", __func__);
+ 			data_rate = IMX662_594_MBPS;
+ 			goto change_datarate;
+ 		}
+ 	} else { // non binning mode
+ 		if ((data_rate != IMX662_720_MBPS) && (data_rate != IMX662_594_MBPS)) {
+-			pr_warn("%s: Selected data rate is not supported in 4 lane non binning mode, switching to 594 data rate!\n", __func__);
++			pr_info("%s: Selected data rate is not supported in 4 lane non binning mode, switching to 594 data rate!\n", __func__);
+ 			data_rate = IMX662_594_MBPS;
+ 			goto change_datarate;
+ 		}
+@@ -1254,13 +1254,13 @@ static int imx662_set_vs_exp(struct imx662 *sensor, u32 exp, unsigned int which_
+ 	pr_debug("%s: vs integration_time_line: %u\n", __func__, integration_time_line);
+ 
+ 	if (integration_time_line < sensor->cur_mode.ae_info.min_vsintegration_line) {
+-		pr_warn("%s vs integration line too small: setting to %u\n", __func__,
++		pr_info("%s vs integration line too small: setting to %u\n", __func__,
+ 			sensor->cur_mode.ae_info.min_vsintegration_line);
+ 		integration_time_line = sensor->cur_mode.ae_info.min_vsintegration_line;
+ 	}
+ 
+ 	if (integration_time_line > sensor->cur_mode.ae_info.max_vsintegration_line) {
+-		pr_warn("%s vs integration line too large: setting to %u\n", __func__,
++		pr_info("%s vs integration line too large: setting to %u\n", __func__,
+ 			sensor->cur_mode.ae_info.max_vsintegration_line);
+ 		integration_time_line = sensor->cur_mode.ae_info.max_vsintegration_line;
+ 	}
+@@ -1319,12 +1319,8 @@ static u32 imx662_get_gain_reg(u32 gain)
+ 
+ 	// check if the gain value is outside the isp bounds, this should never happen
+ 	if (gain < gain_reg2times[0]) {
+-		pr_warn("%s:isp returned too small gain value: %u, setting to min gain\n",
+-			__func__, gain);
+ 		return 0;
+ 	} else if (gain > gain_reg2times[IMX662_GAIN_REG_LEN-1]) {
+-		pr_warn("%s: isp returned too large gain value: %u, setting to max gain\n",
+-			__func__, gain);
+ 		return 240;
+ 	}
+ 
+@@ -1358,7 +1354,7 @@ static int imx662_set_gain(struct imx662 *sensor, u32 gain, u8 which_control)
+ 
+ 	if (sensor->cur_mode.index == IMX662_CLEAR_INDEX) {
+ 		if (gain_reg > max_clear_hdr_gain) {
+-			pr_warn("%s: gain setting for clear hdr too large setting to 80\n", __func__);
++			pr_info("%s: gain setting for clear hdr too large setting to 80\n", __func__);
+ 			gain_reg = max_clear_hdr_gain;
+ 		}
+ 	}
+@@ -1473,7 +1469,7 @@ static int imx662_set_fps(struct imx662 *sensor, u32 fps, u8 which_control)
+ 	line_time = sensor->cur_mode.ae_info.one_line_exp_time_ns;
+ 
+ 	if (fps > sensor->cur_mode.ae_info.max_fps) {
+-		pr_warn("fps %u too large setting to %u\n", fps, sensor->cur_mode.ae_info.max_fps);
++		pr_info("fps %u too large setting to %u\n", fps, sensor->cur_mode.ae_info.max_fps);
+ 		fps = sensor->cur_mode.ae_info.max_fps;
+ 	} else if (fps < sensor->cur_mode.ae_info.min_fps)
+ 		fps = sensor->cur_mode.ae_info.min_fps;
+@@ -1689,11 +1685,11 @@ static int imx662_parse_dt(struct imx662 *sensor, struct i2c_client *client)
+ 
+ 	err = of_property_read_string(node, "gmsl", &gmsl);
+ 	if (err) {
+-		pr_warn("initializing mipi...\n");
++		pr_info("initializing mipi...\n");
+ 		sensor->gmsl = "mipi";
+ 
+ 	} else if (!strcmp(gmsl, "gmsl")) {
+-		pr_warn("initializing GMSL...\n");
++		pr_info("initializing GMSL...\n");
+ 		sensor->gmsl = "gmsl";
+ 	}
+ 	pr_debug("%s: Succesfully parsed device tree\n", __func__);
+@@ -1978,7 +1974,7 @@ static long imx662_priv_ioctl(struct v4l2_subdev *sd,
+ 	long ret = 0;
+ 	struct vvcam_sccb_data_s sensor_reg;
+ 
+-	pr_info("enter %s %u\n", __func__, cmd);
++	pr_debug("enter %s %u\n", __func__, cmd);
+ 	mutex_lock(&sensor->lock);
+ 	switch (cmd) {
+ 	case VVSENSORIOC_S_POWER:
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
+index fa22339..28d4876 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
+@@ -1409,7 +1409,7 @@ static int imx900_change_data_rate(struct imx900 *sensor, u32 data_rate)
+ 		imx900_write_reg(sensor, LANESEL, IMX900_MAX_CSI_LANES);
+ 	}
+ 
+-	pr_warn("%s: Setting data rate to value: %u\n", __func__, data_rate);
++	pr_info("%s: Setting data rate to value: %u\n", __func__, data_rate);
+ 	if ((data_rate == IMX900_2376_MBPS) || (data_rate == IMX900_1485_MBPS)) {
+ 		pr_warn("%s: Selected data rate is not supported, switching to 1188 data rate!\n", __func__);
+ 		data_rate = IMX900_1188_MBPS;
+@@ -1543,7 +1543,7 @@ static int imx900_configure_shutter(struct imx900 *sensor)
+ 
+ 	case SEQ_TRIGGER:
+ 		if (xmsta == MASTER_MODE) {
+-			pr_warn("%s: Sequential Trigger Mode not supported in Master mode, switchig to default\n", __func__);
++			pr_info("%s: Sequential Trigger Mode not supported in Master mode, switchig to default\n", __func__);
+ 			break;
+ 		}
+ 		trigen = 9;
+@@ -1553,7 +1553,7 @@ static int imx900_configure_shutter(struct imx900 *sensor)
+ 
+ 	case FAST_TRIGGER:
+ 		if (xmsta == SLAVE_MODE) {
+-			pr_warn("%s: Fast Trigger Mode not supported in Slave mode, switchig to default\n", __func__);
++			pr_info("%s: Fast Trigger Mode not supported in Slave mode, switchig to default\n", __func__);
+ 			break;
+ 		}
+ 		trigen = 10;
+@@ -1644,10 +1644,10 @@ static int imx900_configure_triggering_pins(struct imx900 *sensor)
+ static int imx900_set_exp(struct imx900 *sensor, u32 exp, unsigned int which_control)
+ {
+ 	int ret = 0;
+-	u32 integration_time_line;
+-	u32 frame_length;
++	s32 integration_time_line;
++	s32 frame_length;
+ 	u32 integration_offset = IMX900_INTEGRATION_OFFSET;
+-	u32 reg_shs;
++	s32 reg_shs;
+ 	u8 min_reg_shs;
+ 	u8 reg_gmrwt2, reg_gmtwt;
+ 
+@@ -1657,11 +1657,21 @@ static int imx900_set_exp(struct imx900 *sensor, u32 exp, unsigned int which_con
+ 
+ 	// from ISP driver
+ 	if (which_control == 0)
+-		integration_time_line = (((exp - integration_offset) >> 10)
++		integration_time_line = (((exp >> 10) - integration_offset)
+ 				* IMX900_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+ 	else // from V4L2 control
+ 		integration_time_line = (exp - integration_offset) * IMX900_K_FACTOR / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+ 
++	if (integration_time_line > sensor->cur_mode.ae_info.max_integration_line) {
++		// pr_info("%s: setting integration time to max value %u\n", __func__, sensor->cur_mode.ae_info.max_integration_line);
++		integration_time_line = sensor->cur_mode.ae_info.max_integration_line;
++		}
++
++	if (integration_time_line < sensor->cur_mode.ae_info.min_integration_line) {
++		// pr_info("%s: setting integration time to min value %u\n", __func__, sensor->cur_mode.ae_info.min_integration_line);
++		integration_time_line = sensor->cur_mode.ae_info.min_integration_line;
++	}
++
+ 	reg_shs = frame_length - integration_time_line;
+ 
+ 	imx900_read_reg(sensor, GMTWT, &reg_gmtwt);
+@@ -1707,12 +1717,8 @@ static u32 imx900_get_gain_reg(u32 gain)
+ 
+ 	// check if the gain value is outside the isp bounds, this should never happen
+ 	if (gain < gain_reg2times[0]) {
+-		pr_warn("%s:isp returned too small gain value: %u, setting to min gain\n",
+-			__func__, gain);
+ 		return 0;
+ 	} else if (gain > gain_reg2times[IMX900_GAIN_REG_LEN-1]) {
+-		pr_warn("%s:isp returned too large gain value: %u, setting to max gain\n",
+-			__func__, gain);
+ 		return IMX900_GAIN_REG_LEN - 1;
+ 	}
+ 
+@@ -1828,6 +1834,7 @@ static int imx900_set_fps(struct imx900 *sensor, u32 fps, u8 which_control)
+ 			sensor->cur_mode.ae_info.max_integration_line = fps_reg - 4;
+ 		}
+ 	}
++	sensor->cur_mode.ae_info.curr_frm_len_lines = fps_reg;
+ 	return ret;
+ }
+ 
+@@ -2055,10 +2062,10 @@ static int imx900_parse_dt(struct imx900 *sensor, struct i2c_client *client)
+ 
+ 	err = of_property_read_string(node, "gmsl", &gmsl);
+ 	if (err) {
+-		pr_warn("initializing mipi...\n");
++		pr_info("initializing mipi...\n");
+ 		sensor->gmsl = "mipi";
+ 	} else if (!strcmp(gmsl, "gmsl")) {
+-		pr_warn("initializing GMSL...\n");
++		pr_info("initializing GMSL...\n");
+ 		sensor->gmsl = "gmsl";
+ 	}
+ 
+@@ -2916,7 +2923,7 @@ static int imx900_set_fmt(struct v4l2_subdev *sd,
+ 	ret = imx900_write_reg_arry(sensor,
+ 		(struct vvcam_sccb_data_s *)sensor->cur_mode.preg_data,
+ 		sensor->cur_mode.reg_data_count);
+-	
++
+ 	if (ret < 0) {
+ 		pr_err("%s:imx900_write_reg_arry error\n", __func__);
+ 		mutex_unlock(&sensor->lock);
+@@ -3482,7 +3489,7 @@ static int imx900_probe(struct i2c_client *client)
+ 					3, 30000, 1, 1000);
+ 	sensor->ctrls.gain = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx900_ctrl_ops, V4L2_CID_GAIN,
+ 					0, 480, 1, 0);
+-	
++
+ 	if (sensor->cur_mode.bit_width == 12) {
+ 		default_black_level = IMX900_DEFAULT_BLACK_LEVEL_12BPP;
+ 	}

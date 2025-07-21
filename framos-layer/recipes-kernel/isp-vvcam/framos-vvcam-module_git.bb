@@ -6,6 +6,7 @@ require framos_nxp_drivers.inc
 SRC_URI += "${FRAMOS_NXP_DRIVERS_REPO};name=framos;"
 SRCREV_framos = "${FRAMOS_NXP_DRIVERS_REV}"
 SRC_URI += "file://0001-fix-module.symvers.patch;patchdir=${WORKDIR}/git"
+SRC_URI += "file://0001-remove-warning-prints.patch;patchdir=${WORKDIR}/git"
 
 inherit module
 
