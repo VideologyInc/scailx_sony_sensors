@@ -24,7 +24,7 @@
 		reg = <0x6a>;
 		csi-mode = "2x4";
 		max-src = <1>;
-		reset-gpios = <&gpio_expander 10 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio_expander 1 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
 
@@ -46,7 +46,7 @@
 		mclk = <24000000>;
 		mclk_source = <0>;
 		status = "okay";
-		// rst-gpios = <&gpio_expander 10 GPIO_ACTIVE_LOW>;
+		// rst-gpios = <&gpio_expander 1 GPIO_ACTIVE_LOW>;
 
 		gmsl = "gmsl";
 		gmsl-ser-device = <&framos_ser_prim_b>;

@@ -30,7 +30,7 @@
 		mclk = <24000000>;
 		mclk_source = <0>;
 		status = "okay";
-		rst-gpios = <&gpio_expander 10 GPIO_ACTIVE_LOW>;
+		rst-gpios = <&gpio_expander 1 GPIO_ACTIVE_LOW>;
 
 		port {
 			mipi_1_ep: endpoint {
