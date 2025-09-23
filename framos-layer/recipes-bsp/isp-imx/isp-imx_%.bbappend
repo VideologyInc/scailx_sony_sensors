@@ -9,7 +9,6 @@ SRCREV_FORMAT .= "_framos"
 SRC_URI += "\
     file://0001-fix-isi-drv-cmakes.patch;patchdir=framos \
     file://0003-isi-cmake.patch \
-    file://0002-patch-scripts.patch \
 "
 
 do_copy_files() {
