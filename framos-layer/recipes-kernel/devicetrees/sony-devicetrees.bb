@@ -29,9 +29,9 @@ SRC_URI += "file://scailx-imx8mp-cam1-imx900.dts;subdir=${S}"
 
 pkg_postinst:${PN} () {
     echo "0x3d imx900.dtbo" >> $D/boot/devicetree/cam-overlays
-    echo "0x1a imx662.dtbo" >> $D/boot/devicetree/cam-overlays
+    echo "0x37 imx662.dtbo" >> $D/boot/devicetree/cam-overlays
     echo "0x10 imx676.dtbo" >> $D/boot/devicetree/cam-overlays
-    echo "0x37 imx678.dtbo" >> $D/boot/devicetree/cam-overlays
+    echo "0x1a imx678.dtbo" >> $D/boot/devicetree/cam-overlays
 }
 
 do_install:append(){
