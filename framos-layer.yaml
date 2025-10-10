@@ -15,7 +15,7 @@ repos:
     url: https://github.com/VideologyInc/scailx_yocto.git
     branch: scarthgap
     # use commit to pin the layer to a specific commit for repeatable builds, otherwise leave it to always use the latest from Scarthgap branch.
-    commit: 62c2722a0ab7b506ec54d408eda7d6d7c1ee6c3e
+    commit: dc1d7ba4240932eddde8093eb6cc24b8491a54f9
 
   framos-layer:
     layers:
