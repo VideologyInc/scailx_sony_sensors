@@ -3,8 +3,13 @@ LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-or-later;md5=fed54355545ffd980b814dab4a3b312c"
 
 require framos_nxp_drivers.inc
-SRC_URI += "   file://0001-imx900-and-other-sensors-driver-updates.patch;patchdir=../../../.."
+SRC_URI += "${FRAMOS_NXP_DRIVERS_REPO};name=framos;"
 SRCREV_framos = "${FRAMOS_NXP_DRIVERS_REV}"
+
+SRC_URI += "file://0001-fix-module.symvers.patch;patchdir=${WORKDIR}/git"
+SRC_URI += "file://0001-remove-warning-prints.patch;patchdir=${WORKDIR}/git"
+
+SRC_URI += "file://0001-imx900-and-other-sensors-driver-updates.patch;patchdir=${WORKDIR}/git"
 
 inherit module
 
