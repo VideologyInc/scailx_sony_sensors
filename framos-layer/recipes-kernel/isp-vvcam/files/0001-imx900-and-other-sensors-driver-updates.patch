@@ -1,0 +1,428 @@
+From 12830686371dc5371a28d8d6de6ad3b7c5d98505 Mon Sep 17 00:00:00 2001
+From: PingVideology <jye@videologyinc.com>
+Date: Thu, 30 Apr 2026 12:28:30 -0400
+Subject: [PATCH] imx900 and other sensors driver updates.
+
+---
+ .../vvcam/v4l2/sensor/imx662/imx662_mipi.c    | 29 ++++++++----
+ .../vvcam/v4l2/sensor/imx676/imx676_mipi.c    | 34 +++++++++-----
+ .../vvcam/v4l2/sensor/imx678/imx678_mipi.c    | 37 +++++++++++-----
+ .../vvcam/v4l2/sensor/imx900/imx900_mipi.c    | 44 ++++++++++++-------
+ 4 files changed, 97 insertions(+), 47 deletions(-)
+
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+index 02f4d4d..6359b47 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+@@ -11,6 +11,11 @@
+  * http://www.gnu.org/copyleft/gpl.html
+  */
+ 
++//
++// 2026.0127.	Fixed imx662 device driver AEC bug which was built in Scailx Yocto devtool.
++// By:			jye@videologyinc.com
++//
++
+ //#define DEBUG 1
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+@@ -56,8 +61,9 @@
+ #define IMX662_MAX_BLACK_LEVEL_10BPP     1023
+ #define IMX662_MAX_BLACK_LEVEL_12BPP     4095
+ 
+-#define IMX662_DEFAULT_BLACK_LEVEL_10BPP 50
+-#define IMX662_DEFAULT_BLACK_LEVEL_12BPP 200
++#define IMX662_DEFAULT_BLACK_LEVEL_8BPP  10
++#define IMX662_DEFAULT_BLACK_LEVEL_10BPP 40
++#define IMX662_DEFAULT_BLACK_LEVEL_12BPP 160
+ 
+ #define IMX662_MIN_SHR0_LENGTH           4
+ #define IMX662_MIN_SHR0_CLEAR_LENGTH     8
+@@ -1145,12 +1151,12 @@ static int imx662_set_exp(struct imx662 *sensor, u32 exp, u8 which_control)
+ 
+ 	frame_length = sensor->cur_mode.ae_info.curr_frm_len_lines;
+ 
+-	if (which_control == 0) { // from ISP driver
+-		integration_time_line = ((exp >> 10)
+-		   * IMX662_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-	} else {  // from V4L2 control
++//	if (which_control == 0) { // from ISP driver
++//		integration_time_line = ((exp >> 10)
++//		   * IMX662_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
++//	} else {  // from V4L2 control
+ 		integration_time_line = (exp * IMX662_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-	}
++//	}
+ 
+ 	if (integration_time_line > sensor->cur_mode.ae_info.max_integration_line) {
+ 		pr_info("%s: setting integration time to max value %u\n", __func__,
+@@ -1343,6 +1349,9 @@ static int imx662_set_gain(struct imx662 *sensor, u32 gain, u8 which_control)
+ 	u32 gain_reg = 0;
+ 	u32 max_clear_hdr_gain = 80;
+ 
++	// make gain u16
++	gain = gain & 0xFFFF;	
++
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 
+ 	if (which_control == 0) { // from isp
+@@ -2129,6 +2138,8 @@ static int imx662_probe(struct i2c_client *client)
+ 	int  i;
+ 	int err = 0;
+ 
++	pr_info("***** AB1945 imx662 Probe start *****\n");
++
+ 	pr_debug("enter %s function\n", __func__);
+ 
+ 	sensor = devm_kmalloc(dev, sizeof(*sensor), GFP_KERNEL);
+@@ -2408,12 +2419,12 @@ static int imx662_probe(struct i2c_client *client)
+ 
+ 	// add new controls
+ 	sensor->ctrls.exposure = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx662_ctrl_ops, V4L2_CID_EXPOSURE,
+-						3, 30000, 1, 1000);
++						5000, 20000, 1, 10000);
+ 	sensor->ctrls.gain = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx662_ctrl_ops, V4L2_CID_GAIN,
+ 					0, 240, 3, 0);
+ 
+ 	sensor->ctrls.black_level = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx662_ctrl_ops, V4L2_CID_BLACK_LEVEL,
+-					 0, 1023, 1, 50);
++					 0, 1023, 1, IMX662_DEFAULT_BLACK_LEVEL_10BPP);
+ 
+ 	sensor->ctrls.data_rate = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx662_ctrl_data_rate, NULL);
+ 	sensor->ctrls.sync_mode = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx662_ctrl_sync_mode, NULL);
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
+index 89f6f3a..3a7f163 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
+@@ -5,6 +5,11 @@
+  * imx676_mipi.c - Framos imx676_mipi.c driver
+  */
+ 
++//
++// 2026.0128.	Fixed imx676 device driver AEC bug which was built in Scailx Yocto devtool.
++// By:			jye@videologyinc.com
++//
++
+ //#define DEBUG 1
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+@@ -50,8 +55,10 @@
+ 
+ #define IMX676_MAX_BLACK_LEVEL_10BPP		1023
+ #define IMX676_MAX_BLACK_LEVEL_12BPP		4095
+-#define IMX676_DEFAULT_BLACK_LEVEL_10BPP	50
+-#define IMX676_DEFAULT_BLACK_LEVEL_12BPP	200
++
++#define IMX676_DEFAULT_BLACK_LEVEL_8BPP		10
++#define IMX676_DEFAULT_BLACK_LEVEL_10BPP	40
++#define IMX676_DEFAULT_BLACK_LEVEL_12BPP	160
+ 
+ #define IMX676_MIN_SHR0_LENGTH              10
+ #define IMX676_MIN_SHR0_CLEAR_LENGTH        12
+@@ -1128,15 +1135,15 @@ static int imx676_set_exp(struct imx676 *sensor, u32 exp, unsigned int which_con
+ 	frame_length = sensor->cur_mode.ae_info.curr_frm_len_lines;
+ 
+ 	/* from ISP driver */
+-	if (which_control == 0) {
+-		integration_time_line = ((exp >> 10)
+-		* IMX676_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-	}
++//	if (which_control == 0) {
++//		integration_time_line = ((exp >> 10)
++//		* IMX676_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
++//	}
+ 	/* from V4L2 control */
+-	else {
++//	else {
+ 		integration_time_line = exp * IMX676_K_FACTOR /
+ 				sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-	}
++//	}
+ 	if (integration_time_line > sensor->cur_mode.ae_info.max_integration_line) {
+ 		pr_info("%s: setting integration time to max value %u\n", __func__,
+ 			sensor->cur_mode.ae_info.max_integration_line);
+@@ -1330,6 +1337,9 @@ static int imx676_set_gain(struct imx676 *sensor, u32 gain, unsigned int which_c
+ 	int ret = 0;
+ 	u32 gain_reg = 0;
+ 	u32 max_clear_hdr_gain = 80;
++	
++	// make gain u16
++	gain = gain & 0xFFFF;	
+ 
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 
+@@ -2155,6 +2165,7 @@ static int imx676_probe(struct i2c_client *client)
+ 	int i;
+ 	int err = 0;
+ 
++	pr_info("***** AB1945 imx676 Probe start *****\n");
+ 
+ 	sensor = devm_kmalloc(dev, sizeof(*sensor), GFP_KERNEL);
+ 	if (!sensor) {
+@@ -2424,11 +2435,12 @@ static int imx676_probe(struct i2c_client *client)
+ 	/* add new controls */
+ 
+ 	sensor->ctrls.exposure = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx676_ctrl_ops, V4L2_CID_EXPOSURE,
+-							3, 30000, 1, 1000);
++							5000, 20000, 1, 10000);
+ 	sensor->ctrls.gain = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx676_ctrl_ops, V4L2_CID_GAIN,
+ 						0, 240, 3, 0);
+ 	sensor->ctrls.black_level = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx676_ctrl_ops, V4L2_CID_BLACK_LEVEL,
+-							0, 1023, 1, 50);
++							0, 1023, 1, IMX676_DEFAULT_BLACK_LEVEL_10BPP);
++							
+ 	sensor->ctrls.data_rate = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx676_ctrl_data_rate, NULL);
+ 	sensor->ctrls.sync_mode = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx676_ctrl_sync_mode, NULL);
+ 	sensor->ctrls.framerate = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx676_ctrl_framerate, NULL);
+@@ -2543,5 +2555,5 @@ static struct i2c_driver imx676_i2c_driver = {
+ 
+ 
+ module_i2c_driver(imx676_i2c_driver);
+-MODULE_DESCRIPTION("IMX676 MIPI Camera Subdev Driver");
++MODULE_DESCRIPTION("IMX676 MIPI Camera Subdev Driver-AEC Fixed");
+ MODULE_LICENSE("GPL");
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
+index 0db5c1f..ec0189f 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
+@@ -5,6 +5,11 @@
+  * imx678_mipi.c - Framos imx678_mipi.c driver
+  */
+ 
++//
++// 2026.0128.	Fixed imx678 device driver AEC bug which was built in Scailx Yocto devtool.
++// By:			jye@videologyinc.com
++//
++
+ //#define DEBUG 1
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+@@ -50,8 +55,10 @@
+ 
+ #define IMX678_MAX_BLACK_LEVEL_10BPP		1023
+ #define IMX678_MAX_BLACK_LEVEL_12BPP		4095
+-#define IMX678_DEFAULT_BLACK_LEVEL_10BPP	50
+-#define IMX678_DEFAULT_BLACK_LEVEL_12BPP	200
++
++#define IMX678_DEFAULT_BLACK_LEVEL_8BPP		10
++#define IMX678_DEFAULT_BLACK_LEVEL_10BPP	40
++#define IMX678_DEFAULT_BLACK_LEVEL_12BPP	160
+ 
+ #define IMX678_MIN_SHR0_LENGTH 9
+ #define IMX678_MIN_SHR0_CLEAR_LENGTH     8
+@@ -1069,16 +1076,16 @@ static int imx678_set_exp(struct imx678 *sensor, u32 exp, unsigned int which_con
+ 	frame_length = sensor->cur_mode.ae_info.curr_frm_len_lines;
+ 
+ 	/* from ISP driver */
+-	if (which_control == 0) {
+-		pr_debug("enter %s exposure received: %u\n", __func__, exp >> 10);
+-		integration_time_line = ((exp >> 10)
+-		* IMX678_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-	}
++//	if (which_control == 0) {
++//		pr_debug("enter %s exposure received: %u\n", __func__, exp >> 10);
++//		integration_time_line = ((exp >> 10)
++//		* IMX678_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
++//	}
+ 	/* from V4L2 control */
+-	else {
++//	else {
+ 		pr_debug("enter %s exposure received: %u\n", __func__, exp);
+ 		integration_time_line = exp * IMX678_K_FACTOR / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-	}
++//	}
+ 
+ 	if (integration_time_line > sensor->cur_mode.ae_info.max_integration_line) {
+ 		pr_info("%s: setting integration time to max value %u\n", __func__,
+@@ -1272,6 +1279,9 @@ static int imx678_set_gain(struct imx678 *sensor, u32 gain, unsigned int which_c
+ 	u32 gain_reg = 0;
+ 	u32 max_clear_hdr_gain = 80;
+ 
++	// make gain u16
++	gain = gain & 0xFFFF;	
++
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 
+ 	if (which_control == 0) { /* from isp */
+@@ -2071,6 +2081,8 @@ static int imx678_probe(struct i2c_client *client)
+ 	int  i;
+ 	int err = 0;
+ 
++	pr_info("***** AB1945 imx678 Probe start *****\n");
++
+ 	pr_debug("enter %s function\n", __func__);
+ 
+ 	sensor = devm_kmalloc(dev, sizeof(*sensor), GFP_KERNEL);
+@@ -2340,11 +2352,12 @@ static int imx678_probe(struct i2c_client *client)
+ 	/* add new controls */
+ 
+ 	sensor->ctrls.exposure = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx678_ctrl_ops, V4L2_CID_EXPOSURE,
+-						3, 30000, 1, 1000);
++						5000, 20000, 1, 10000);
+ 	sensor->ctrls.gain = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx678_ctrl_ops, V4L2_CID_GAIN,
+ 						0, 240, 3, 0);
+ 	sensor->ctrls.black_level = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx678_ctrl_ops, V4L2_CID_BLACK_LEVEL,
+-						0, 1023, 1, 50);
++						0, 1023, 1, IMX678_DEFAULT_BLACK_LEVEL_10BPP);
++						
+ 	sensor->ctrls.data_rate = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx678_ctrl_data_rate, NULL);
+ 	sensor->ctrls.sync_mode = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx678_ctrl_sync_mode, NULL);
+ 	sensor->ctrls.framerate = v4l2_ctrl_new_custom(&sensor->ctrls.handler, imx678_ctrl_framerate, NULL);
+@@ -2462,5 +2475,5 @@ static struct i2c_driver imx678_i2c_driver = {
+ 
+ 
+ module_i2c_driver(imx678_i2c_driver);
+-MODULE_DESCRIPTION("IMX678 MIPI Camera Subdev Driver");
++MODULE_DESCRIPTION("IMX678 MIPI Camera Subdev Driver-AEC Fixed");
+ MODULE_LICENSE("GPL");
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
+index 28d4876..d6ecbc3 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
+@@ -11,6 +11,11 @@
+  * http://www.gnu.org/copyleft/gpl.html
+  */
+ 
++//
++// 2026.0126.	Fixed imx900 device driver AEC bug which was built in Scailx Yocto devtool and bitbake.
++// By:			jye@videologyinc.com
++//
++
+ // #define DEBUG 1
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+@@ -936,7 +941,7 @@ static int imx900_get_current_datarate(struct imx900 *sensor, u8 *data_rate)
+ 		*data_rate = IMX900_594_MBPS;
+ 		break;
+ 	default:
+-		pr_err("%s: invalid value in ths registed, could not get data rate mode\n", __func__);
++		// pr_err("%s: invalid value in ths registed, could not get data rate mode\n", __func__);
+ 		break;
+ 	}
+ 	return 0;
+@@ -1409,9 +1414,9 @@ static int imx900_change_data_rate(struct imx900 *sensor, u32 data_rate)
+ 		imx900_write_reg(sensor, LANESEL, IMX900_MAX_CSI_LANES);
+ 	}
+ 
+-	pr_info("%s: Setting data rate to value: %u\n", __func__, data_rate);
++	pr_warn("%s: Setting data rate to value: %u\n", __func__, data_rate);
+ 	if ((data_rate == IMX900_2376_MBPS) || (data_rate == IMX900_1485_MBPS)) {
+-		pr_warn("%s: Selected data rate is not supported, switching to 1188 data rate!\n", __func__);
++		// pr_warn("%s: Selected data rate is not supported, switching to 1188 data rate!\n", __func__);
+ 		data_rate = IMX900_1188_MBPS;
+ 	}
+ 	switch (data_rate) {
+@@ -1495,7 +1500,7 @@ static int imx900_set_data_rate(struct imx900 *sensor, u32 data_rate)
+ 
+ 	ret = imx900_change_data_rate(sensor, data_rate);
+ 	if (ret) {
+-		pr_err("%s: unable to set data rate\n", __func__);
++		// pr_err("%s: unable to set data rate\n", __func__);
+ 		return ret;
+ 	}
+ 
+@@ -1543,7 +1548,7 @@ static int imx900_configure_shutter(struct imx900 *sensor)
+ 
+ 	case SEQ_TRIGGER:
+ 		if (xmsta == MASTER_MODE) {
+-			pr_info("%s: Sequential Trigger Mode not supported in Master mode, switchig to default\n", __func__);
++			pr_warn("%s: Sequential Trigger Mode not supported in Master mode, switchig to default\n", __func__);
+ 			break;
+ 		}
+ 		trigen = 9;
+@@ -1553,7 +1558,7 @@ static int imx900_configure_shutter(struct imx900 *sensor)
+ 
+ 	case FAST_TRIGGER:
+ 		if (xmsta == SLAVE_MODE) {
+-			pr_info("%s: Fast Trigger Mode not supported in Slave mode, switchig to default\n", __func__);
++			pr_warn("%s: Fast Trigger Mode not supported in Slave mode, switchig to default\n", __func__);
+ 			break;
+ 		}
+ 		trigen = 10;
+@@ -1644,10 +1649,10 @@ static int imx900_configure_triggering_pins(struct imx900 *sensor)
+ static int imx900_set_exp(struct imx900 *sensor, u32 exp, unsigned int which_control)
+ {
+ 	int ret = 0;
+-	s32 integration_time_line;
+-	s32 frame_length;
++	u32 integration_time_line;
++	u32 frame_length;
+ 	u32 integration_offset = IMX900_INTEGRATION_OFFSET;
+-	s32 reg_shs;
++	u32 reg_shs;
+ 	u8 min_reg_shs;
+ 	u8 reg_gmrwt2, reg_gmtwt;
+ 
+@@ -1717,8 +1722,12 @@ static u32 imx900_get_gain_reg(u32 gain)
+ 
+ 	// check if the gain value is outside the isp bounds, this should never happen
+ 	if (gain < gain_reg2times[0]) {
++		pr_warn("%s:isp returned too small gain value: %u, setting to min gain\n",
++			__func__, gain);
+ 		return 0;
+ 	} else if (gain > gain_reg2times[IMX900_GAIN_REG_LEN-1]) {
++		pr_warn("%s:isp returned too large gain value: %u, setting to max gain\n",
++			__func__, gain);
+ 		return IMX900_GAIN_REG_LEN - 1;
+ 	}
+ 
+@@ -1740,6 +1749,9 @@ static int imx900_set_gain(struct imx900 *sensor, u32 gain, unsigned int which_c
+ 	int ret = 0;
+ 	u32 gain_reg = 0;
+ 
++	// make gain u16
++	gain = gain & 0xFFFF;	
++
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 
+ 	// from ISP
+@@ -2062,10 +2074,10 @@ static int imx900_parse_dt(struct imx900 *sensor, struct i2c_client *client)
+ 
+ 	err = of_property_read_string(node, "gmsl", &gmsl);
+ 	if (err) {
+-		pr_info("initializing mipi...\n");
++		pr_warn("initializing mipi...\n");
+ 		sensor->gmsl = "mipi";
+ 	} else if (!strcmp(gmsl, "gmsl")) {
+-		pr_info("initializing GMSL...\n");
++		pr_warn("initializing GMSL...\n");
+ 		sensor->gmsl = "gmsl";
+ 	}
+ 
+@@ -2923,7 +2935,7 @@ static int imx900_set_fmt(struct v4l2_subdev *sd,
+ 	ret = imx900_write_reg_arry(sensor,
+ 		(struct vvcam_sccb_data_s *)sensor->cur_mode.preg_data,
+ 		sensor->cur_mode.reg_data_count);
+-
++	
+ 	if (ret < 0) {
+ 		pr_err("%s:imx900_write_reg_arry error\n", __func__);
+ 		mutex_unlock(&sensor->lock);
+@@ -3206,6 +3218,8 @@ static int imx900_probe(struct i2c_client *client)
+ 	int err = 0;
+ 	int default_black_level;
+ 
++	pr_info("***** AB2068 imx900 Probe start *****\n");
++
+ 	pr_debug("enter %s function\n", __func__);
+ 
+ 	sensor = devm_kmalloc(dev, sizeof(*sensor), GFP_KERNEL);
+@@ -3486,9 +3500,9 @@ static int imx900_probe(struct i2c_client *client)
+ 
+ 	// add new controls
+ 	sensor->ctrls.exposure = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx900_ctrl_ops, V4L2_CID_EXPOSURE,
+-					3, 30000, 1, 1000);
++					1000, 20000, 100, 5000);
+ 	sensor->ctrls.gain = v4l2_ctrl_new_std(&sensor->ctrls.handler, &imx900_ctrl_ops, V4L2_CID_GAIN,
+-					0, 480, 1, 0);
++					0, 240, 1, 0);
+ 
+ 	if (sensor->cur_mode.bit_width == 12) {
+ 		default_black_level = IMX900_DEFAULT_BLACK_LEVEL_12BPP;
+@@ -3613,5 +3627,5 @@ static struct i2c_driver imx900_i2c_driver = {
+ };
+ 
+ module_i2c_driver(imx900_i2c_driver);
+-MODULE_DESCRIPTION("IMX900 MIPI Camera Subdev Driver");
++MODULE_DESCRIPTION("IMX900 MIPI Camera Subdev Driver-AEC Fixed");
+ MODULE_LICENSE("GPL");
