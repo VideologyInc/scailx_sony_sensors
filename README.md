@@ -2,6 +2,17 @@
 
 ## Overview
 This repo is a kas overlay layer on top of [scailx-yocto](https://github.com/VideologyInc/scailx_yocto) with recipes for [framos NXP drivers](https://github.com/framosimaging/framos-nxp-drivers).
+Also Videology's own framos driver in [https://github.com/VideologyInc/framos-vvcam-module].
+
+-------------------------------------------------------------------------------------------
+
+Updates.
+
+2026.1030.	Added framos imx662, imx678 and imx900 drivers updates for vvget and Scailx Studio to get / set correct camera values.
+
+
+
+-------------------------------------------------------------------------------------------
 
 The kernel modules are built and installed sepperately.
 The vvcam driver is patched to support the Sony sensors via the built-in ISP.

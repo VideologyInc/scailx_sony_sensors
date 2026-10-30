@@ -1,0 +1,87 @@
+From 9b7eb468a9eabcb29da6ebbb615056890e7c6f1a Mon Sep 17 00:00:00 2001
+From: PingVideology <jye@videologyinc.com>
+Date: Fri, 30 Oct 2026 12:26:01 -0400
+Subject: [PATCH] AB#2948. framos imx driver changes.
+
+---
+ isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c | 10 +++++-----
+ isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c | 13 +++++--------
+ isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c | 15 ++++++---------
+ 3 files changed, 16 insertions(+), 22 deletions(-)
+
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+index 6359b47..e634ecc 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+@@ -1151,12 +1151,12 @@ static int imx662_set_exp(struct imx662 *sensor, u32 exp, u8 which_control)
+ 
+ 	frame_length = sensor->cur_mode.ae_info.curr_frm_len_lines;
+ 
+-//	if (which_control == 0) { // from ISP driver
+-//		integration_time_line = ((exp >> 10)
+-//		   * IMX662_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-//	} else {  // from V4L2 control
++	if (which_control == 0) { // from ISP driver: exp is Q10 microseconds (us << 10)
++		integration_time_line = ((exp >> 10)
++		   * IMX662_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
++	} else {  // from V4L2 control: exp is plain microseconds
+ 		integration_time_line = (exp * IMX662_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-//	}
++	}
+ 
+ 	if (integration_time_line > sensor->cur_mode.ae_info.max_integration_line) {
+ 		pr_info("%s: setting integration time to max value %u\n", __func__,
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
+index 3a7f163..fc9b1fa 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
+@@ -1134,16 +1134,13 @@ static int imx676_set_exp(struct imx676 *sensor, u32 exp, unsigned int which_con
+ 
+ 	frame_length = sensor->cur_mode.ae_info.curr_frm_len_lines;
+ 
+-	/* from ISP driver */
+-//	if (which_control == 0) {
+-//		integration_time_line = ((exp >> 10)
+-//		* IMX676_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-//	}
+-	/* from V4L2 control */
+-//	else {
++	if (which_control == 0) { /* from ISP driver: exp is Q10 microseconds (us << 10) */
++		integration_time_line = ((exp >> 10)
++		* IMX676_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
++	} else { /* from V4L2 control: exp is plain microseconds */
+ 		integration_time_line = exp * IMX676_K_FACTOR /
+ 				sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-//	}
++	}
+ 	if (integration_time_line > sensor->cur_mode.ae_info.max_integration_line) {
+ 		pr_info("%s: setting integration time to max value %u\n", __func__,
+ 			sensor->cur_mode.ae_info.max_integration_line);
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
+index ec0189f..a30d940 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
+@@ -1075,17 +1075,14 @@ static int imx678_set_exp(struct imx678 *sensor, u32 exp, unsigned int which_con
+ 
+ 	frame_length = sensor->cur_mode.ae_info.curr_frm_len_lines;
+ 
+-	/* from ISP driver */
+-//	if (which_control == 0) {
+-//		pr_debug("enter %s exposure received: %u\n", __func__, exp >> 10);
+-//		integration_time_line = ((exp >> 10)
+-//		* IMX678_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-//	}
+-	/* from V4L2 control */
+-//	else {
++	if (which_control == 0) { /* from ISP driver: exp is Q10 microseconds (us << 10) */
++		pr_debug("enter %s exposure received: %u\n", __func__, exp >> 10);
++		integration_time_line = ((exp >> 10)
++		* IMX678_K_FACTOR) / sensor->cur_mode.ae_info.one_line_exp_time_ns;
++	} else { /* from V4L2 control: exp is plain microseconds */
+ 		pr_debug("enter %s exposure received: %u\n", __func__, exp);
+ 		integration_time_line = exp * IMX678_K_FACTOR / sensor->cur_mode.ae_info.one_line_exp_time_ns;
+-//	}
++	}
+ 
+ 	if (integration_time_line > sensor->cur_mode.ae_info.max_integration_line) {
+ 		pr_info("%s: setting integration time to max value %u\n", __func__,
