@@ -1,0 +1,248 @@
+From ab280f0163740b4fe01e16e38547b16f6c63cec0 Mon Sep 17 00:00:00 2001
+From: PingVideology <jye@videologyinc.com>
+Date: Mon, 9 Nov 2026 15:18:38 -0500
+Subject: [PATCH] AB#3018. 4 device driver *.c files changed.
+
+---
+ isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c | 15 +++++++--------
+ isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c | 15 +++++++--------
+ isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c | 11 +++++------
+ isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c | 13 ++++++-------
+ 4 files changed, 25 insertions(+), 29 deletions(-)
+
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+index e634ecc..7817070 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx662/imx662_mipi.c
+@@ -351,7 +351,7 @@ static struct vvcam_mode_info_s pimx662_mode_info[] = {
+ 
+ 			.max_again             = 32382,    // 30 db
+ 			.min_again             = 1 * 1024, // 0 db
+-			.max_dgain             = 4044235,  // 42 db
++			.max_dgain             = 128914,  // 42 db
+ 			.min_dgain             = 1 * 1024, // 0 db
+ 			.gain_step             = 36,
+ 
+@@ -395,7 +395,7 @@ static struct vvcam_mode_info_s pimx662_mode_info[] = {
+ 
+ 			.max_again             = 32382,    // 30 db
+ 			.min_again             = 1 * 1024, // 0 db
+-			.max_dgain             = 4044235,  // 42 db
++			.max_dgain             = 128914,  // 42 db
+ 			.min_dgain             = 1 * 1024, // 0 db
+ 			.gain_step             = 36,
+ 
+@@ -439,7 +439,7 @@ static struct vvcam_mode_info_s pimx662_mode_info[] = {
+ 
+ 			.max_again             = 32382,    // 30 db
+ 			.min_again             = 1 * 1024, // 0 db
+-			.max_dgain             = 4044235,  // 42 db
++			.max_dgain             = 128914,  // 42 db
+ 			.min_dgain             = 1 * 1024, // 0 db
+ 			.gain_step             = 36,
+ 
+@@ -484,7 +484,7 @@ static struct vvcam_mode_info_s pimx662_mode_info[] = {
+ 
+ 			.max_again             = 32382,    // 30 db
+ 			.min_again             = 1 * 1024, // 0 db
+-			.max_dgain             = 4044235,  // 42 db
++			.max_dgain             = 128914,  // 42 db
+ 			.min_dgain             = 1 * 1024, // 0 db
+ 			.gain_step             = 36,
+ 
+@@ -536,12 +536,12 @@ static struct vvcam_mode_info_s pimx662_mode_info[] = {
+ 
+ 			.max_again             = 32382,    // 30 db
+ 			.min_again             = 1 * 1024, // 0 db
+-			.max_dgain             = 4044235,  // 42 db
++			.max_dgain             = 128914,  // 42 db
+ 			.min_dgain             = 1 * 1024, // 0 db
+ 
+ 			.max_short_again       = 32382,    // 30 db
+ 			.min_short_again       = 1 * 1024, // 0 db
+-			.max_short_dgain       = 4044235,  // 42 db,
++			.max_short_dgain       = 128914,  // 42 db,
+ 			.min_short_dgain       = 1 * 1024, // 0 db,
+ 
+ 			// not used at the moment, read from xml
+@@ -1349,8 +1349,7 @@ static int imx662_set_gain(struct imx662 *sensor, u32 gain, u8 which_control)
+ 	u32 gain_reg = 0;
+ 	u32 max_clear_hdr_gain = 80;
+ 
+-	// make gain u16
+-	gain = gain & 0xFFFF;	
++	// keep full 32-bit Q10 gain: values from the ISP exceed 16 bits (would roll over past 65536)
+ 
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
+index fc9b1fa..5837755 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx676/imx676_mipi.c
+@@ -326,7 +326,7 @@ static struct vvcam_mode_info_s pimx676_mode_info[] = {
+ 
+ 			.max_again		= 32382,/* 30 db */
+ 			.min_again		= 1 * 1024,/* 0 db */
+-			.max_dgain		= 4044235,/* 42 db */
++			.max_dgain		= 128914,/* 42 db */
+ 			.min_dgain		= 1 * 1024,/* 0 db */
+ 			.gain_step		= 36,
+ 			.start_exposure		= 5000 * 1024,/* 3 * 400 * 1024 */
+@@ -369,7 +369,7 @@ static struct vvcam_mode_info_s pimx676_mode_info[] = {
+ 
+ 			.max_again		= 32382,/* 30 db */
+ 			.min_again		= 1 * 1024,/* 0 db */
+-			.max_dgain		= 4044235,/* 42 db */
++			.max_dgain		= 128914,/* 42 db */
+ 			.min_dgain		= 1 * 1024,/* 0 db */
+ 			.gain_step		= 36,
+ 			.start_exposure		= 5000 * 1024,/* 3 * 400 * 1024 */
+@@ -412,7 +412,7 @@ static struct vvcam_mode_info_s pimx676_mode_info[] = {
+ 
+ 			.max_again		= 32382,/* 30 db */
+ 			.min_again		= 1 * 1024,/* 0 db */
+-			.max_dgain		= 4044235,/* 42 db */
++			.max_dgain		= 128914,/* 42 db */
+ 			.min_dgain		= 1 * 1024,/* 0 db */
+ 			.gain_step		= 36,
+ 			.start_exposure		= 5000 * 1024,/* 3 * 400 * 1024 */
+@@ -455,7 +455,7 @@ static struct vvcam_mode_info_s pimx676_mode_info[] = {
+ 
+ 			.max_again		= 32382,/* 30 db */
+ 			.min_again		= 1 * 1024,/* 0 db */
+-			.max_dgain		= 4044235,/* 42 db */
++			.max_dgain		= 128914,/* 42 db */
+ 			.min_dgain		= 1 * 1024,/* 0 db */
+ 			.gain_step		= 36,
+ 			.start_exposure		= 5000 * 1024,/* 3 * 400 * 1024 */
+@@ -505,12 +505,12 @@ static struct vvcam_mode_info_s pimx676_mode_info[] = {
+ 
+ 			.max_again             = 32382,    // 30 db
+ 			.min_again             = 1 * 1024, // 0 db
+-			.max_dgain             = 4044235,  // 42 db
++			.max_dgain             = 128914,  // 42 db
+ 			.min_dgain             = 1 * 1024, // 0 db
+ 
+ 			.max_short_again       = 32382,    // 30 db
+ 			.min_short_again       = 1 * 1024, // 0 db
+-			.max_short_dgain       = 4044235,  // 42 db,
++			.max_short_dgain       = 128914,  // 42 db,
+ 			.min_short_dgain       = 1 * 1024, // 0 db,
+ 
+ 			// not used at the moment, read from xml
+@@ -1335,8 +1335,7 @@ static int imx676_set_gain(struct imx676 *sensor, u32 gain, unsigned int which_c
+ 	u32 gain_reg = 0;
+ 	u32 max_clear_hdr_gain = 80;
+ 	
+-	// make gain u16
+-	gain = gain & 0xFFFF;	
++	// keep full 32-bit Q10 gain: values from the ISP exceed 16 bits (would roll over past 65536)
+ 
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
+index a30d940..9b62621 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx678/imx678_mipi.c
+@@ -332,7 +332,7 @@ static struct vvcam_mode_info_s pimx678_mode_info[] = {
+ 
+ 			.max_again             = 32382,    /* 30 db */
+ 			.min_again             = 1 * 1024, /* 0 db */
+-			.max_dgain             = 4044235,  /* 42 db */
++			.max_dgain             = 128914,  /* 42 db */
+ 			.min_dgain             = 1 * 1024, /* 0 db */
+ 			.gain_step             = 36,
+ 			.start_exposure        = 5000 * 1024, /* 5000 * 1024 */
+@@ -375,7 +375,7 @@ static struct vvcam_mode_info_s pimx678_mode_info[] = {
+ 
+ 			.max_again             = 32382,    /* 30 db */
+ 			.min_again             = 1 * 1024, /* 0 db */
+-			.max_dgain             = 4044235,  /* 42 db */
++			.max_dgain             = 128914,  /* 42 db */
+ 			.min_dgain             = 1 * 1024, /* 0 db */
+ 			.gain_step             = 36,
+ 
+@@ -427,12 +427,12 @@ static struct vvcam_mode_info_s pimx678_mode_info[] = {
+ 
+ 			.max_again             = 32382,    // 30 db
+ 			.min_again             = 1 * 1024, // 0 db
+-			.max_dgain             = 4044235,  // 42 db
++			.max_dgain             = 128914,  // 42 db
+ 			.min_dgain             = 1 * 1024, // 0 db
+ 
+ 			.max_short_again       = 32382,    // 30 db
+ 			.min_short_again       = 1 * 1024, // 0 db
+-			.max_short_dgain       = 4044235,  // 42 db,
++			.max_short_dgain       = 128914,  // 42 db,
+ 			.min_short_dgain       = 1 * 1024, // 0 db,
+ 
+ 			// not used at the moment, read from xml
+@@ -1276,8 +1276,7 @@ static int imx678_set_gain(struct imx678 *sensor, u32 gain, unsigned int which_c
+ 	u32 gain_reg = 0;
+ 	u32 max_clear_hdr_gain = 80;
+ 
+-	// make gain u16
+-	gain = gain & 0xFFFF;	
++	// keep full 32-bit Q10 gain: values from the ISP exceed 16 bits (would roll over past 65536)
+ 
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 
+diff --git a/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c b/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
+index d6ecbc3..f42e946 100644
+--- a/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
++++ b/isp-vvcam/vvcam/v4l2/sensor/imx900/imx900_mipi.c
+@@ -295,7 +295,7 @@ static struct vvcam_mode_info_s pimx900_mode_info[] = {
+ 
+ 			.max_again			= 16229, // 24db
+ 			.min_again			= 1024,	 // 0 db
+-			.max_dgain			= 257217, // 48 db
++			.max_dgain			= 16229, // 24 db
+ 			.min_dgain			= 1024,	 // 0db ,
+ 			.gain_step			= 36,
+ 
+@@ -339,7 +339,7 @@ static struct vvcam_mode_info_s pimx900_mode_info[] = {
+ 
+ 			.max_again			= 16229,  // 24db
+ 			.min_again			= 1024,	  // 0 db
+-			.max_dgain			= 257217, // 48 db
++			.max_dgain			= 16229, // 24 db
+ 			.min_dgain			= 1024,   // 0db ,
+ 			.gain_step			= 36,
+ 
+@@ -383,7 +383,7 @@ static struct vvcam_mode_info_s pimx900_mode_info[] = {
+ 
+ 			.max_again			= 16229,	// 24db
+ 			.min_again			= 1024,	 // 0 db
+-			.max_dgain			= 257217,   // 48 db
++			.max_dgain			= 16229,   // 24 db
+ 			.min_dgain			= 1024,	 // 0db ,
+ 			.gain_step			= 36,
+ 
+@@ -427,7 +427,7 @@ static struct vvcam_mode_info_s pimx900_mode_info[] = {
+ 
+ 			.max_again		 = 16229,	// 24db
+ 			.min_again		 = 1024,	 // 0 db
+-			.max_dgain		 = 257217,   // 48 db
++			.max_dgain		 = 16229,   // 24 db
+ 			.min_dgain		 = 1024,	 // 0db ,
+ 			.gain_step		 = 36,
+ 
+@@ -471,7 +471,7 @@ static struct vvcam_mode_info_s pimx900_mode_info[] = {
+ 
+ 			.max_again		= 16229,  // 24db
+ 			.min_again		= 1024,	  // 0 db
+-			.max_dgain		= 257217, // 48 db
++			.max_dgain		= 16229, // 24 db
+ 			.min_dgain		= 1024,	  // 0db ,
+ 			.gain_step		= 36,
+ 
+@@ -1749,8 +1749,7 @@ static int imx900_set_gain(struct imx900 *sensor, u32 gain, unsigned int which_c
+ 	int ret = 0;
+ 	u32 gain_reg = 0;
+ 
+-	// make gain u16
+-	gain = gain & 0xFFFF;	
++	// keep full 32-bit Q10 gain: values from the ISP exceed 16 bits (would roll over past 65536)
+ 
+ 	pr_debug("enter %s: gain received: %u control: %u\n", __func__, gain, which_control);
+ 

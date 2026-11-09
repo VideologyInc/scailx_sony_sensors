@@ -12,6 +12,8 @@ SRC_URI += "file://0001-imx900-and-other-sensors-driver-updates.patch;patchdir=$
 
 SRC_URI += "file://0001-AB-2948.-framos-imx-driver-changes.patch;patchdir=${WORKDIR}/git"
 
+SRC_URI += "file://0001-AB-3018.-4-device-driver-.c-files-changed.patch;patchdir=${WORKDIR}/git"
+
 inherit module
 
 MODULES_MODULE_SYMVERS_LOCATION = "max9679x"
