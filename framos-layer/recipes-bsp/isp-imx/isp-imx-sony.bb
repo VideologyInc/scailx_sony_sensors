@@ -2,15 +2,16 @@ LICENSE = "CLOSED"
 
 require framos_nxp_drivers.inc
 
-SRC_URI += "${FRAMOS_NXP_DRIVERS_REPO};name=framos;"
-SRCREV_framos = "${FRAMOS_NXP_DRIVERS_REV}"
-
-SRC_URI += " \
-    file://imx662.sh \
-    file://imx676.sh \
-    file://imx678.sh \
-    file://imx900.sh \
+SRC_URI += "file://imx662.sh \
+           file://imx676.sh \
+           file://imx678.sh \
+           file://imx900.sh \
 "
+
+SRC_URI += "file://0001-AB-3036.-Framos-updates-of-.drv-files.patch;patchdir=${WORKDIR}/git"
+
+
+SRCREV_framos = "${FRAMOS_NXP_DRIVERS_REV}"
 
 S = "${WORKDIR}/git/isp-imx/units/isi"
 B = "${WORKDIR}/build"

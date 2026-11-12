@@ -1,0 +1,85 @@
+From 5068f952095f69b33b8fcb7d7848febd1066a6c1 Mon Sep 17 00:00:00 2001
+From: PingVideology <jye@videologyinc.com>
+Date: Thu, 12 Nov 2026 11:40:47 -0500
+Subject: [PATCH] AB#3036. Framos updates of *.drv files.
+
+---
+ isp-imx/units/isi/drv/imx662/source/IMX662.c | 4 ++--
+ isp-imx/units/isi/drv/imx678/source/IMX678.c | 4 ++--
+ isp-imx/units/isi/drv/imx900/source/IMX900.c | 5 ++---
+ 3 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/isp-imx/units/isi/drv/imx662/source/IMX662.c b/isp-imx/units/isi/drv/imx662/source/IMX662.c
+index 1c2ed2b..d2adcdf 100644
+--- a/isp-imx/units/isi/drv/imx662/source/IMX662.c
++++ b/isp-imx/units/isi/drv/imx662/source/IMX662.c
+@@ -760,7 +760,6 @@ static RESULT IMX662_IsiSetIntegrationTimeIss(IsiSensorHandle_t handle,
+         case ISI_EXPO_FRAME_TYPE_1FRAME:
+             IntLine = pIntegrationTime->IntegrationTime.linearInt;
+             if (IntLine != pIMX662Ctx->IntLine) {
+-                printf("\n\ngoing into S_EXP ioctl %u\n\n", IntLine);
+                 ret = ioctl(pHalCtx->sensor_fd, VVSENSORIOC_S_EXP, &IntLine);
+                 if (ret != 0) {
+                     TRACE(IMX662_ERROR,"%s:set sensor linear exp error!\n", __func__);
+@@ -769,7 +768,8 @@ static RESULT IMX662_IsiSetIntegrationTimeIss(IsiSensorHandle_t handle,
+                pIMX662Ctx->IntLine = IntLine;
+             }
+             TRACE(IMX662_INFO, "%s set linear exp %d \n", __func__,IntLine);
+-            pIMX662Ctx->IntTime.IntegrationTime.linearInt =  IntLine * oneLineTime;
++            // kernel S_EXP already converts the Q10-us time to lines; report back the value set
++            pIMX662Ctx->IntTime.IntegrationTime.linearInt =  IntLine;
+             break;
+         case ISI_EXPO_FRAME_TYPE_2FRAMES:
+             IntLine = pIntegrationTime->IntegrationTime.dualInt.dualIntTime;
+diff --git a/isp-imx/units/isi/drv/imx678/source/IMX678.c b/isp-imx/units/isi/drv/imx678/source/IMX678.c
+index 892edb6..e6839ee 100644
+--- a/isp-imx/units/isi/drv/imx678/source/IMX678.c
++++ b/isp-imx/units/isi/drv/imx678/source/IMX678.c
+@@ -760,7 +760,6 @@ static RESULT IMX678_IsiSetIntegrationTimeIss(IsiSensorHandle_t handle,
+         case ISI_EXPO_FRAME_TYPE_1FRAME:
+             IntLine = pIntegrationTime->IntegrationTime.linearInt;
+             if (IntLine != pIMX678Ctx->IntLine) {
+-                printf("\n\ngoing into S_EXP ioctl %u\n\n", IntLine);
+                 ret = ioctl(pHalCtx->sensor_fd, VVSENSORIOC_S_EXP, &IntLine);
+                 if (ret != 0) {
+                     TRACE(IMX678_ERROR,"%s:set sensor linear exp error!\n", __func__);
+@@ -769,7 +768,8 @@ static RESULT IMX678_IsiSetIntegrationTimeIss(IsiSensorHandle_t handle,
+                pIMX678Ctx->IntLine = IntLine;
+             }
+             TRACE(IMX678_INFO, "%s set linear exp %d \n", __func__,IntLine);
+-            pIMX678Ctx->IntTime.IntegrationTime.linearInt =  IntLine * oneLineTime;
++            // kernel S_EXP already converts the Q10-us time to lines; report back the value set
++            pIMX678Ctx->IntTime.IntegrationTime.linearInt =  IntLine;
+             break;
+         case ISI_EXPO_FRAME_TYPE_2FRAMES:
+             IntLine = pIntegrationTime->IntegrationTime.dualInt.dualIntTime;
+diff --git a/isp-imx/units/isi/drv/imx900/source/IMX900.c b/isp-imx/units/isi/drv/imx900/source/IMX900.c
+index 2142ae7..6d34568 100644
+--- a/isp-imx/units/isi/drv/imx900/source/IMX900.c
++++ b/isp-imx/units/isi/drv/imx900/source/IMX900.c
+@@ -736,7 +736,6 @@ static RESULT IMX900_IsiSetIntegrationTimeIss(IsiSensorHandle_t handle,
+ 
+     IMX900_Context_t *pIMX900Ctx = (IMX900_Context_t *) handle;
+     HalContext_t *pHalCtx = (HalContext_t *) pIMX900Ctx->IsiCtx.HalHandle;
+-    printf("\n\nAAAAAAAAAAAAAAA %u\n\n", pIntegrationTime->IntegrationTime.linearInt);
+     if (pIntegrationTime == NULL)
+         return RET_NULL_POINTER;
+ 
+@@ -747,7 +746,6 @@ static RESULT IMX900_IsiSetIntegrationTimeIss(IsiSensorHandle_t handle,
+         case ISI_EXPO_FRAME_TYPE_1FRAME:
+             IntLine = pIntegrationTime->IntegrationTime.linearInt;
+             if (IntLine != pIMX900Ctx->IntLine) {
+-                printf("\n\ngoing into S_EXP ioctl %u\n\n", IntLine);
+                 ret = ioctl(pHalCtx->sensor_fd, VVSENSORIOC_S_EXP, &IntLine);
+                 if (ret != 0) {
+                     TRACE(IMX900_ERROR,"%s:set sensor linear exp error!\n", __func__);
+@@ -756,7 +754,8 @@ static RESULT IMX900_IsiSetIntegrationTimeIss(IsiSensorHandle_t handle,
+                pIMX900Ctx->IntLine = IntLine;
+             }
+             TRACE(IMX900_INFO, "%s set linear exp %d \n", __func__,IntLine);
+-            pIMX900Ctx->IntTime.IntegrationTime.linearInt =  IntLine * oneLineTime;
++            // kernel S_EXP already converts the Q10-us time to lines; report back the value set
++            pIMX900Ctx->IntTime.IntegrationTime.linearInt =  IntLine;
+             break;
+         case ISI_EXPO_FRAME_TYPE_2FRAMES:
+             IntLine = pIntegrationTime->IntegrationTime.dualInt.dualIntTime;
