@@ -6,10 +6,7 @@ SRC_URI += "file://imx662.sh \
            file://imx676.sh \
            file://imx678.sh \
            file://imx900.sh \
-"
-
-SRC_URI += "file://0001-AB-3036.-Framos-updates-of-.drv-files.patch;patchdir=${WORKDIR}/git"
-
+		   file://0001-AB-3036.-Framos-updates-of-.drv-files.patch;patchdir=${S}/../../.."
 
 SRCREV_framos = "${FRAMOS_NXP_DRIVERS_REV}"
 
